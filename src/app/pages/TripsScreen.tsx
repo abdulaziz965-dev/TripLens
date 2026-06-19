@@ -12,7 +12,7 @@ export function TripsScreen({ onCreateTrip, onSelectTrip }: { onCreateTrip: () =
     <div style={{ position: "relative", width: "100%", minHeight: "100dvh", display: "flex", flexDirection: "column", background: T.bg }}>
       <div style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none", paddingBottom: 82 }}>
         <div style={{ background: `linear-gradient(160deg, ${T.navy} 0%, #16304f 100%)`, paddingBottom: 22, borderRadius: "0 0 28px 28px", boxShadow: "0 8px 32px rgba(15,23,42,0.18)" }}>
-          <StatusBar light />
+          
           <div style={{ padding: "6px 20px 0" }}>
             <p style={{ ...body, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Your Trips</p>
             <h1 style={{ ...display, fontSize: 28, color: "white", letterSpacing: -0.7, lineHeight: 1.1 }}>Trip planning</h1>

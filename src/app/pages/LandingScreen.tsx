@@ -41,7 +41,7 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(10,22,40,0.55) 48%, rgba(10,22,40,0.97) 100%)" }} />
 
         {/* Header bar */}
-        <StatusBar light />
+        
         <div style={{ position: "absolute", top: 70, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <LogoMark size={34} />

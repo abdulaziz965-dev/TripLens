@@ -52,7 +52,10 @@ export function HomeScreen({
   const { data: trips } = useTrips(user?.uid);
 
   const [insightIdx, setInsightIdx] = useState(0);
-  const displayName = user?.displayName?.split(" ")[0] || "Alex";
+  const displayName =
+  user?.displayName?.split(" ")[0] ||
+  user?.email?.split("@")[0] ||
+  "Traveler";
 
   const destinations = getSeasonalDestinations();
   const seasonalText = getSeasonalRangeText();
@@ -77,7 +80,7 @@ export function HomeScreen({
           paddingBottom: 24, borderRadius: "0 0 28px 28px",
           boxShadow: "0 8px 32px rgba(15,23,42,0.18)",
         }}>
-          <StatusBar light />
+          
           <div style={{ padding: "6px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <p style={{ ...body, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Good Morning ☀️</p>

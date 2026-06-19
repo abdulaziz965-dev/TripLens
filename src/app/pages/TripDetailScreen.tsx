@@ -56,7 +56,7 @@ export function TripDetailScreen({ trip, onBack }: { trip: any; onBack: () => vo
         paddingBottom: 32, borderRadius: "0 0 32px 32px",
         boxShadow: "0 10px 40px rgba(0,0,0,0.15)"
       }}>
-        <StatusBar light />
+        
         <div style={{ padding: "8px 20px 0", display: "flex", alignItems: "center", gap: 12 }}>
           <button onClick={onBack} style={{
             width: 38, height: 38, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.15)",

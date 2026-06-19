@@ -266,9 +266,11 @@ export function TripDashboardScreen({
   const [tab, setTab] = useState<DashboardTab>("transport");
   const [transportMode, setTransportMode] = useState<TransportMode>("roadtrip");
   const [bookingId, setBookingId] = useState<string | null>(null);
+  const [selectedHotel, setSelectedHotel] = useState<HotelRecommendation | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [expenseTitle, setExpenseTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
   const [expenseType, setExpenseType] = useState<(typeof MANUAL_TYPES)[number]["id"]>("food");
   const [savingExpense, setSavingExpense] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
@@ -310,47 +312,75 @@ export function TripDashboardScreen({
   };
 
   const handleBookHotel = async (hotel: HotelRecommendation) => {
-    if (!trip || !auth.currentUser) return;
-    setBookingId(hotel.id);
-    try {
-      const amount = hotel.pricePerNight * hotel.roomsRequired * nights;
-      await addExpense({
-        tripId: trip.id,
-        userId: auth.currentUser.uid,
-        label: `${hotel.name} (${hotel.roomsRequired} room${hotel.roomsRequired > 1 ? "s" : ""})`,
-        amount: `₹${amount.toLocaleString("en-IN")}`,
-        category: "Confirmed",
-        expenseType: "hotel",
-      });
-      setTab("expenses");
-    } catch (err) {
-      console.error("[TripLens] Failed to add hotel expense:", err);
-      alert("Could not save expense. Check Firestore rules and try again.");
-    } finally {
-      setBookingId(null);
-    }
-  };
+  if (!trip || !auth.currentUser) return;
 
-  const handleBookTravelOption = async (option: (typeof travelOptions)[number]) => {
-    if (!trip || !auth.currentUser) return;
-    setBookingId(option.id);
-    try {
-      await addExpense({
-        tripId: trip.id,
-        userId: auth.currentUser.uid,
-        label: option.label,
-        amount: option.amount,
-        category: "Confirmed",
-        expenseType: option.type,
-      });
-      setTab("expenses");
-    } catch (err) {
-      console.error("[TripLens] Failed to add transport expense:", err);
-      alert("Could not save expense. Check Firestore rules and try again.");
-    } finally {
-      setBookingId(null);
-    }
-  };
+  setBookingId(hotel.id);
+
+  try {
+    const amount =
+      hotel.pricePerNight *
+      hotel.roomsRequired *
+      nights;
+
+    await addExpense({
+      tripId: trip.id,
+      userId: auth.currentUser.uid,
+      label: `${hotel.name} (${hotel.roomsRequired} room${
+        hotel.roomsRequired > 1 ? "s" : ""
+      })`,
+      amount: `₹${amount.toLocaleString("en-IN")}`,
+      category: "Confirmed",
+      expenseType: "hotel",
+    });
+
+    setConfirmationMessage(
+      `🏨 ${hotel.name} has been successfully booked!\n\nTotal Amount: ₹${amount.toLocaleString(
+        "en-IN"
+      )}`
+    );
+
+  } catch (err) {
+    console.error("[TripLens] Failed to add hotel expense:", err);
+
+    alert(
+      "Could not save expense. Check Firestore rules and try again."
+    );
+  } finally {
+    setBookingId(null);
+  }
+};
+
+ const handleBookTravelOption = async (
+  option: (typeof travelOptions)[number]
+) => {
+  if (!trip || !auth.currentUser) return;
+
+  setBookingId(option.id);
+
+  try {
+    await addExpense({
+      tripId: trip.id,
+      userId: auth.currentUser.uid,
+      label: option.label,
+      amount: option.amount,
+      category: "Confirmed",
+      expenseType: option.type,
+    });
+
+    setConfirmationMessage(
+      `✈️ ${option.label} has been successfully booked!\n\nTotal Amount: ${option.amount}`
+    );
+
+  } catch (err) {
+    console.error("[TripLens] Failed to add transport expense:", err);
+
+    alert(
+      "Could not save expense. Check Firestore rules and try again."
+    );
+  } finally {
+    setBookingId(null);
+  }
+};
 
   const handleAddManualExpense = async () => {
     if (!trip || !auth.currentUser || !expenseTitle || !expenseAmount) return;
@@ -475,7 +505,7 @@ export function TripDashboardScreen({
           boxShadow: "0 8px 32px rgba(15,23,42,0.18)",
         }}
       >
-        <StatusBar light />
+        
         <div style={{ padding: "4px 20px 0", display: "flex", alignItems: "center", gap: 12 }}>
           <button
             onClick={onBack}
@@ -771,14 +801,19 @@ export function TripDashboardScreen({
               charges included.
             </p>
             {hotels.map(h => (
-              <HotelCard
+              <div
                 key={h.id}
+                onClick={() => setSelectedHotel(h)}
+                style={{ cursor: "pointer" }}
+              >
+              <HotelCard
                 hotel={h}
                 nights={nights}
                 onBook={() => handleBookHotel(h)}
                 booking={bookingId === h.id}
               />
-            ))}
+            </div>
+        ))}
           </div>
         )}
 
@@ -1064,6 +1099,160 @@ export function TripDashboardScreen({
           </div>
         )}
       </div>
+      {selectedHotel && (
+  <div
+    onClick={() => setSelectedHotel(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.7)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "flex-end",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        width: "100%",
+        maxHeight: "90vh",
+        overflowY: "auto",
+        background: "white",
+        borderRadius: "24px 24px 0 0",
+      }}
+    >
+      <img
+        src={selectedHotel.photos[0]}
+        alt={selectedHotel.name}
+        style={{
+          width: "100%",
+          height: 240,
+          objectFit: "cover",
+        }}
+      />
+
+      <div style={{ padding: 20 }}>
+        <h2
+          style={{
+            ...heading,
+            fontSize: 24,
+            color: T.navy,
+            marginBottom: 8,
+          }}
+        >
+          {selectedHotel.name}
+        </h2>
+
+        <p style={{ ...body, color: T.slate }}>
+          ⭐ {selectedHotel.rating} • {selectedHotel.distance}
+        </p>
+
+        <div style={{ marginTop: 20 }}>
+          <p style={{ ...heading, fontSize: 16 }}>
+            About this Hotel
+          </p>
+
+          <p
+            style={{
+              ...body,
+              color: T.slate,
+              marginTop: 8,
+              lineHeight: 1.7,
+            }}
+          >
+            {selectedHotel.analysis.join(" ")}
+          </p>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <p style={{ ...heading, fontSize: 16 }}>
+            Reviews
+          </p>
+
+          <p style={{ ...body, color: T.slate }}>
+            "Excellent location and family friendly."
+          </p>
+
+          <p style={{ ...body, color: T.slate }}>
+            "Clean rooms and good service."
+          </p>
+
+          <p style={{ ...body, color: T.slate }}>
+            "Worth the price for groups."
+          </p>
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <button
+            style={{
+              width: "100%",
+              padding: 14,
+              borderRadius: 14,
+              border: "none",
+              background: T.teal,
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            Open in Google Maps
+          </button>
+        </div>
+
+        <button
+          onClick={() => handleBookHotel(selectedHotel)}
+          style={{
+            width: "100%",
+            marginTop: 12,
+            padding: 14,
+            borderRadius: 14,
+            border: "none",
+            background: T.navy,
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Book This Hotel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{confirmationMessage && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.6)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        background: "#fff",
+        padding: 24,
+        borderRadius: 20,
+        width: "90%",
+        maxWidth: 400,
+        textAlign: "center",
+      }}
+    >
+      <h3>Booking Confirmed 🎉</h3>
+
+      <p style={{ whiteSpace: "pre-line" }}>
+        {confirmationMessage}
+      </p>
+
+      <button
+        onClick={() => setConfirmationMessage(null)}
+      >
+        Done
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -58,16 +58,27 @@ export async function createUserDocument(user: FirebaseUser) {
 
   try {
     await setDoc(
-      userRef,
-      {
-        uid: user.uid,
-        name: user.displayName ?? "",
-        email: user.email ?? "",
-        photoURL: user.photoURL ?? null,
-        createdAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+  userRef,
+  {
+    uid: user.uid,
+    displayName:
+    user.displayName ||
+    user.email?.split("@")[0] ||
+    "Traveler",
+    email: user.email ?? "",
+    photoURL: user.photoURL ?? null,
+
+    notifications: true,
+    currency: "INR",
+    distanceUnit: "km",
+
+    upiId: "",
+    preferredPayment: "UPI",
+
+    createdAt: serverTimestamp(),
+  },
+  { merge: true }
+);
 
     console.log("[TravelLens][Firestore] Firestore write success", {
       path: `users/${user.uid}`,

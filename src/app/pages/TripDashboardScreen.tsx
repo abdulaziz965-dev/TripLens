@@ -3,12 +3,17 @@ import {
   ChevronLeft, MapPin, Calendar, Users, Hotel, Car, Wallet,
   Star, CheckCircle, AlertTriangle, Plus, X, Trash2, Plane,
 } from "lucide-react";
-import { Timestamp } from "firebase/firestore";
-import { auth } from "../../firebase/config";
+import {
+  Timestamp,
+  doc,
+  getDoc
+} from "firebase/firestore";
+import { auth,db } from "../../firebase/config";
 import { T, display, body, heading, label, bodyMed, subhead } from "../theme";
 import { StatusBar, Chip, SectionCard, AmountPill } from "../components/SharedComponents";
 import { useTrip, useTripExpenses } from "../hooks/useRealtime";
 import { addExpense, deleteExpense, updateTrip } from "../../services/dataService";
+
 import {
   getHotelsForTrip,
   getTransportForTrip,
@@ -30,6 +35,7 @@ const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: "transfers", label: "Transfers", icon: <Car size={16} /> },
   { id: "expenses", label: "Expenses", icon: <Wallet size={16} /> },
 ];
+
 
 const TRANSPORT_MODES: { id: TransportMode; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -263,8 +269,10 @@ export function TripDashboardScreen({
 }) {
   const { data: trip, loading } = useTrip(tripId);
   const { data: expenses } = useTripExpenses(tripId, auth.currentUser?.uid);
+  
   const [tab, setTab] = useState<DashboardTab>("transport");
   const [transportMode, setTransportMode] = useState<TransportMode>("roadtrip");
+  
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<HotelRecommendation | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
@@ -275,8 +283,39 @@ export function TripDashboardScreen({
   const [savingExpense, setSavingExpense] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
   const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("Traveler");
+
+React.useEffect(() => {
+  const loadProfile = async () => {
+    const user = auth.currentUser;
+
+    if (!user) return;
+
+    try {
+      const snap = await getDoc(
+        doc(db, "users", user.uid)
+      );
+
+      if (snap.exists()) {
+        const data = snap.data();
+
+        setDisplayName(
+          data.displayName ||
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          "Traveler"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadProfile();
+}, []);
 
   const hotels = useMemo(() => (trip ? getHotelsForTrip(trip) : []), [trip]);
+  
   const transfers = useMemo(() => (trip ? getTransportForTrip(trip) : []), [trip]);
 
   const filteredTravelOptions = useMemo(

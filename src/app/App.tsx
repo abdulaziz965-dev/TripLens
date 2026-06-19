@@ -6,7 +6,6 @@ import {
   loginWithGoogle,
   registerWithEmail
 } from "../services/authService";
-import { EmailAuthScreen } from "./pages/EmailAuthScreen";
 
 // Infrastructure
 import { T } from "./theme";
@@ -24,6 +23,12 @@ import { TripDashboardScreen } from "./pages/TripDashboardScreen";
 import { ExpensesScreen } from "./pages/ExpensesScreen";
 import { ProfileScreen } from "./pages/ProfileScreen";
 import { AppLoadingScreen } from "./pages/AppLoadingScreen";
+import { PaymentMethodsScreen } from "./pages/PaymentMethodsScreen";
+import { EmailAuthScreen } from "./pages/EmailAuthScreen";
+import { SettingsScreen } from "./pages/SettingsScreen";
+import { TravelerVerificationScreen } from "./pages/TravelerVerificationScreen";
+import { EditProfileScreen } from "./pages/EditProfileScreen";
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Route Wrappers (Logic & Auth)
@@ -302,6 +307,10 @@ export default function App() {
        <Route path="/email-auth" element={<EmailAuthScreen />} />
         <Route path="/trips" element={<TripsRoute ready={authReady} user={currentUser} />} />
         <Route path="/expenses" element={<ExpensesRoute ready={authReady} user={currentUser} />} />
+        <Route path="/settings" element={ <AppViewport> <SettingsScreen /> </AppViewport>}/>
+        <Route path="/payments" element={ <AppViewport> <PaymentMethodsScreen /> </AppViewport>}/>
+        <Route path="/verification" element={ <AppViewport> <TravelerVerificationScreen />  </AppViewport>}/>
+        <Route path="/edit-profile" element={ <AppViewport> <EditProfileScreen /></AppViewport>}/>
         <Route path="/profile" element={<ProfileRoute ready={authReady} user={currentUser} />} />
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>

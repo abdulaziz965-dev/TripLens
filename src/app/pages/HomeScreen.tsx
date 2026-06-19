@@ -4,6 +4,8 @@ import { type User as FirebaseUser } from "firebase/auth";
 import { T, display, body, heading, label, bodyMed, IMG } from "../theme";
 import { Chip, StatusBar, BottomTabBar } from "../components/SharedComponents";
 import { useInsights, useTrips } from "../hooks/useRealtime";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Global Trends / Seasonal Logic
@@ -52,13 +54,36 @@ export function HomeScreen({
   const { data: trips } = useTrips(user?.uid);
 
   const [insightIdx, setInsightIdx] = useState(0);
-  const displayName =
-  user?.displayName?.split(" ")[0] ||
-  user?.email?.split("@")[0] ||
-  "Traveler";
+const [displayName, setDisplayName] = useState("Traveler");
 
   const destinations = getSeasonalDestinations();
   const seasonalText = getSeasonalRangeText();
+  useEffect(() => {
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      const snap = await getDoc(
+        doc(db, "users", user.uid)
+      );
+
+      if (snap.exists()) {
+        const data = snap.data();
+
+        setDisplayName(
+          data.displayName ||
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          "Traveler"
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadProfile();
+}, [user]);
 
   useEffect(() => {
     if (insights.length === 0) return;

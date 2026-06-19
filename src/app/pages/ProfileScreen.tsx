@@ -3,23 +3,66 @@ import { Settings, BadgeCheck, Wallet, ChevronRight, LogOut } from "lucide-react
 import { type User as FirebaseUser } from "firebase/auth";
 import { T, display, body, heading } from "../theme";
 import {  SectionCard, BottomTabBar, Chip } from "../components/SharedComponents";
+import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { useTrips } from "../hooks/useRealtime";
 
-const PROFILE_SETTINGS = [
-  { icon: <Settings size={16} />, label: "Settings", desc: "Preferences, notifications, and privacy" },
-  { icon: <BadgeCheck size={16} />, label: "Traveler Verification", desc: "Identity and trust profile" },
-  { icon: <Wallet size={16} />, label: "Payment Methods", desc: "Cards, wallets, and billing details" },
-];
+
 
 export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; onLogout: () => void }) {
   const email = user?.email || "traveler@triplens.com";
+  const PROFILE_SETTINGS = [
+  { icon: <Settings size={16} />, label: "Settings", desc: "Preferences, notifications, and privacy" },
 
-  const displayName =
-    user?.displayName ||
-    email.split("@")[0].charAt(0).toUpperCase() +
-    email.split("@")[0].slice(1);
+  { icon: <Settings size={16} />, label: "Edit Profile", desc: "Change display name" },
+
+  { icon: <BadgeCheck size={16} />, label: "Traveler Verification", desc: "Identity and trust profile" },
+
+  { icon: <Wallet size={16} />, label: "Payment Methods", desc: "Cards, wallets, and billing details" },
+];
+
+  const navigate = useNavigate();
+  const { data: trips } = useTrips(user?.uid);
+  const [displayName, setDisplayName] = React.useState("Traveler");
 
   const avatarText = displayName.charAt(0).toUpperCase();
   const [activeModal, setActiveModal] = React.useState<string | null>(null);
+  React.useEffect(() => {
+  const loadProfile = async () => {
+    if (!user) return;
+
+    const snap = await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+    if (snap.exists()) {
+      const data = snap.data();
+
+      setDisplayName(
+        data.displayName ||
+        user.displayName ||
+        "Traveler"
+      );
+    }
+  };
+
+  loadProfile();
+}, [user]);
+const tripsPlanned = trips.length;
+
+const totalBudget = trips.reduce((sum, trip) => {
+  const value = Number(
+    String(trip.cost || "0")
+      .replace(/[₹,]/g, "")
+  );
+
+  return sum + (isNaN(value) ? 0 : value);
+}, 0);
+
+const destinationsVisited = new Set(
+  trips.map(trip => trip.name)
+).size;
 
   return (
     <div style={{ position: "relative", width: "100%", minHeight: "100dvh", display: "flex", flexDirection: "column", background: T.bg }}>
@@ -68,7 +111,7 @@ export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; o
       }}
     >
       <div>
-        <p style={{ ...heading, fontSize: 24 }}>8</p>
+        <p style={{ ...heading, fontSize: 24 }}>{tripsPlanned} </p>
         <p style={{ ...body, fontSize: 12 }}>
           Trips Planned
         </p>
@@ -76,22 +119,28 @@ export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; o
 
       <div>
         <p style={{ ...heading, fontSize: 24 }}>
-          ₹42K
-        </p>
+  ₹{totalBudget.toLocaleString("en-IN")}
+</p>
         <p style={{ ...body, fontSize: 12 }}>
           Budget Managed
         </p>
       </div>
 
       <div>
-        <p style={{ ...heading, fontSize: 24 }}>12</p>
-        <p style={{ ...body, fontSize: 12 }}>
-          Hotels Viewed
-        </p>
+        <div>
+  <p style={{ ...heading, fontSize: 24 }}>
+    {tripsPlanned}
+  </p>
+  <p style={{ ...body, fontSize: 12 }}>
+    Active Trips
+  </p>
+</div>
       </div>
 
       <div>
-        <p style={{ ...heading, fontSize: 24 }}>5</p>
+        <p style={{ ...heading, fontSize: 24 }}>
+  {destinationsVisited}
+</p>
         <p style={{ ...body, fontSize: 12 }}>
           Destinations
         </p>
@@ -110,7 +159,19 @@ export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; o
                 padding: 16,
                 cursor: "pointer"
               }}
-              onClick={() => setActiveModal(item.label)}
+             onClick={() => {
+  if (item.label === "Settings") {
+    navigate("/settings");
+  } else if (item.label === "Edit Profile") {
+    navigate("/edit-profile");
+  } else if (item.label === "Traveler Verification") {
+    navigate("/verification");
+  } else if (item.label === "Payment Methods") {
+    navigate("/payments");
+  } else {
+    setActiveModal(item.label);
+  }
+}}
 >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 12, background: "rgba(20,184,166,0.08)", border: "1px solid rgba(20,184,166,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: T.teal, flexShrink: 0 }}>
@@ -133,113 +194,8 @@ export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; o
           </button>
         </div>
       </div>
-      {activeModal === "Settings" && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 9999
-    }}
-  >
-    <SectionCard
-      style={{
-        width: "90%",
-        maxWidth: 400,
-        padding: 20
-      }}
-    >
-      <h3>Settings</h3>
+      
 
-      <p>🔔 Notifications: Enabled</p>
-      <p>🌙 Theme: Light</p>
-      <p>💱 Currency: INR</p>
-
-      <button
-        onClick={() => setActiveModal(null)}
-      >
-        Close
-      </button>
-    </SectionCard>
-  </div>
-)}
-{activeModal === "Traveler Verification" && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 9999
-    }}
-  >
-    <SectionCard
-      style={{
-        width: "90%",
-        maxWidth: 400,
-        padding: 20
-      }}
-    >
-      <h3>Traveler Verification</h3>
-
-      <p>✅ Email Verified</p>
-      <p>✅ Account Active</p>
-      <p>✅ Trusted Traveler</p>
-
-      <Chip
-        color={T.green}
-        bg="rgba(16,185,129,0.08)"
-        border="rgba(16,185,129,0.18)"
-      >
-        VERIFIED
-      </Chip>
-
-      <div style={{ marginTop: 20 }}>
-        <button onClick={() => setActiveModal(null)}>
-          Close
-        </button>
-      </div>
-    </SectionCard>
-  </div>
-)}
-{activeModal === "Payment Methods" && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0,0,0,0.6)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 9999
-    }}
-  >
-    <SectionCard
-      style={{
-        width: "90%",
-        maxWidth: 400,
-        padding: 20
-      }}
-    >
-      <h3>Payment Methods</h3>
-
-      <p>💳 No cards added</p>
-      <p>🏦 UPI Supported</p>
-      <p>💰 Wallet Ready</p>
-
-      <button
-        onClick={() => setActiveModal(null)}
-      >
-        Close
-      </button>
-    </SectionCard>
-  </div>
-)}
 
       <BottomTabBar />
     </div>

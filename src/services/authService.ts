@@ -1,6 +1,12 @@
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { auth } from "../firebase/config";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { createUserDocument } from "./userService";
+import { auth } from "../firebase/config";
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
@@ -75,4 +81,31 @@ export async function loginWithGoogle() {
 
     throw error;
   }
+}
+export async function registerWithEmail(
+  email: string,
+  password: string
+) {
+  const result = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+
+  await createUserDocument(result.user);
+
+  return result.user;
+}
+
+export async function loginWithEmail(
+  email: string,
+  password: string
+) {
+  const result = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
+  );
+
+  return result.user;
 }

@@ -11,9 +11,14 @@ const PROFILE_SETTINGS = [
 ];
 
 export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; onLogout: () => void }) {
-  const displayName = user?.displayName || "Alex Morgan";
-  const email = user?.email || "alex.morgan@triplens.com";
-  const avatarText = (displayName || "A").trim().charAt(0).toUpperCase();
+  const email = user?.email || "traveler@triplens.com";
+
+  const displayName =
+    user?.displayName ||
+    email.split("@")[0].charAt(0).toUpperCase() +
+    email.split("@")[0].slice(1);
+
+  const avatarText = displayName.charAt(0).toUpperCase();
 
   return (
     <div style={{ position: "relative", width: "100%", minHeight: "100dvh", display: "flex", flexDirection: "column", background: T.bg }}>

@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { loginWithGoogle } from "../services/authService";
+import {
+  loginWithGoogle,
+  registerWithEmail
+} from "../services/authService";
+import { EmailAuthScreen } from "./pages/EmailAuthScreen";
 
 // Infrastructure
 import { T } from "./theme";
@@ -106,6 +110,7 @@ function LoginRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null
           customData: firebaseError.customData,
           raw: loginError,
         });
+
         setError(firebaseError.message ?? "Google sign-in failed.");
       } else {
         console.error("[TravelLens][UI] Login flow failed", { raw: loginError });
@@ -116,9 +121,31 @@ function LoginRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null
     }
   };
 
+  const handlePhoneLogin = () => {
+    alert("Phone Authentication Coming Soon");
+  };
+
+  const handleEmailSignup = async (
+  email: string,
+  password: string
+) => {
+  try {
+    await registerWithEmail(email, password);
+    navigate("/home", { replace: true });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
   return (
     <AppViewport background={T.navy}>
-      <LoginScreen onLogin={handleLogin} loading={loading} error={error} />
+      <LoginScreen
+        onLogin={handleLogin}
+        onPhoneLogin={handlePhoneLogin}
+        onEmailSignup={handleEmailSignup}
+        loading={loading}
+        error={error}
+      />
     </AppViewport>
   );
 }
@@ -272,6 +299,7 @@ export default function App() {
         <Route path="/home" element={<HomeRoute ready={authReady} user={currentUser} />} />
         <Route path="/create-trip" element={<CreateTripRoute ready={authReady} user={currentUser} />} />
         <Route path="/trip/:tripId" element={<TripDashboardRoute ready={authReady} user={currentUser} />} />
+       <Route path="/email-auth" element={<EmailAuthScreen />} />
         <Route path="/trips" element={<TripsRoute ready={authReady} user={currentUser} />} />
         <Route path="/expenses" element={<ExpensesRoute ready={authReady} user={currentUser} />} />
         <Route path="/profile" element={<ProfileRoute ready={authReady} user={currentUser} />} />

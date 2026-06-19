@@ -51,10 +51,14 @@ export interface Trip {
   cost: string;
   type: string;
   createdAt: Timestamp;
+  savedAt?: Timestamp;
 }
 
 export type ExpenseType =
   | "hotel"
+  | "flight"
+  | "train"
+  | "bus"
   | "food"
   | "shopping"
   | "activities"
@@ -191,4 +195,8 @@ export const updateTrip = async (tripId: string, updates: Partial<Trip>) => {
 
 export const deleteTrip = async (tripId: string) => {
   return deleteDoc(doc(db, "trips", tripId));
+};
+
+export const deleteExpense = async (expenseId: string) => {
+  return deleteDoc(doc(db, "expenses", expenseId));
 };

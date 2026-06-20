@@ -63,6 +63,8 @@ export type ExpenseType =
   | "shopping"
   | "activities"
   | "transport"
+  | "transfer"
+  | "activity"
   | "miscellaneous";
 
 export interface Expense {

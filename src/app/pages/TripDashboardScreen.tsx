@@ -24,6 +24,7 @@ import {
 type DashboardTab =
   | "transport"
   | "hotels"
+  | "activities"
   | "transfers"
   | "expenses";
 
@@ -32,6 +33,7 @@ type TransportMode = "roadtrip" | "flight";
 const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
   { id: "transport", label: "Transport", icon: <Car size={16} /> },
   { id: "hotels", label: "Hotels", icon: <Hotel size={16} /> },
+  { id: "activities", label: "Activities", icon: <MapPin size={16} /> },
   { id: "transfers", label: "Transfers", icon: <Car size={16} /> },
   { id: "expenses", label: "Expenses", icon: <Wallet size={16} /> },
 ];
@@ -51,40 +53,359 @@ const TRANSPORT_MODES: { id: TransportMode; label: string; icon: React.ReactNode
     description: "Air travel options",
   },
 ];
+const activitiesByCity: Record<string, any[]> = {
+  ooty: [
+    {
+      id: "tea",
+      name: "Tea Museum",
+      price: "₹200",
+      duration: "90 Minutes",
+      rating: "4.6",
+      image:
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      description:
+        "Discover the history of tea cultivation and processing in the Nilgiris.",
+    },
+    {
+      id: "boat",
+      name: "Boat Ride",
+      price: "₹350",
+      duration: "1 Hour",
+      rating: "4.8",
+      image:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+      description:
+        "Enjoy a peaceful boat ride surrounded by Ooty's scenic landscapes.",
+    },
+    {
+      id: "peak",
+      name: "Doddabetta Peak",
+      price: "₹150",
+      duration: "2 Hours",
+      rating: "4.7",
+      image:
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
+      description:
+        "Visit the highest peak in the Nilgiris and enjoy panoramic views.",
+    },
+    {
+      id: "garden",
+      name: "Botanical Garden",
+      price: "₹100",
+      duration: "2 Hours",
+      rating: "4.5",
+      image:
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+      description:
+        "Explore Ooty's famous botanical gardens featuring rare plants and flowers.",
+    },
+  ],
 
+  goa: [
+    {
+      id: "scuba",
+      name: "Scuba Diving",
+      price: "₹2500",
+      duration: "3 Hours",
+      rating: "4.9",
+      image:
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5",
+      description:
+        "Explore vibrant marine life beneath Goa's crystal-clear waters.",
+    },
+    {
+      id: "parasailing",
+      name: "Parasailing",
+      price: "₹1800",
+      duration: "30 Minutes",
+      rating: "4.8",
+      image:
+        "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
+      description:
+        "Experience breathtaking aerial views of Goa's beaches.",
+    },
+    {
+      id: "dudhsagar",
+      name: "Dudhsagar Falls",
+      price: "₹1200",
+      duration: "Half Day",
+      rating: "4.9",
+      image:
+        "https://images.unsplash.com/photo-1439066615861-d1af74d74000",
+      description:
+        "Visit one of India's tallest and most spectacular waterfalls.",
+    },
+    {
+      id: "cruise",
+      name: "Sunset Cruise",
+      price: "₹900",
+      duration: "2 Hours",
+      rating: "4.6",
+      image:
+        "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
+      description:
+        "Enjoy music, food, and beautiful sunset views over the Arabian Sea.",
+    },
+  ],
+
+  hyderabad: [
+    {
+      id: "charminar",
+      name: "Charminar",
+      price: "₹100",
+      duration: "2 Hours",
+      rating: "4.7",
+      image:
+        "https://images.unsplash.com/photo-1599661046289-e31897846e41",
+      description:
+        "Explore Hyderabad's iconic monument and surrounding markets.",
+    },
+    {
+      id: "ramoji",
+      name: "Ramoji Film City",
+      price: "₹1350",
+      duration: "Full Day",
+      rating: "4.8",
+      image:
+        "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
+      description:
+        "Visit the world's largest integrated film studio complex.",
+    },
+    {
+      id: "golconda",
+      name: "Golconda Fort",
+      price: "₹200",
+      duration: "3 Hours",
+      rating: "4.7",
+      image:
+        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
+      description:
+        "Walk through centuries of history at Hyderabad's famous fort.",
+    },
+    {
+      id: "hussain",
+      name: "Hussain Sagar Boat Ride",
+      price: "₹300",
+      duration: "1 Hour",
+      rating: "4.5",
+      image:
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      description:
+        "Enjoy a relaxing boat ride to the Buddha statue in Hussain Sagar Lake.",
+    },
+  ],
+};
 const travelOptions = [
+  // ✈️ FLIGHTS
   {
-    id: "flight",
+    id: "indigo-flight",
     type: "flight",
-    title: "Flight",
+    title: "Economy Flight",
     provider: "IndiGo",
     label: "IndiGo Flight",
     amount: "₹5800",
     duration: "2h 15m",
+    comfort: "★★★★☆",
+    image:
+      "https://images.unsplash.com/photo-1436491865332-7a61a109cc05",
     mode: "flight" as TransportMode,
-    highlights: ["Fastest option", "Direct route", "In-flight service"],
+    highlights: [
+      "Fastest option",
+      "Direct route",
+      "In-flight service",
+    ],
   },
+
   {
-    id: "train",
+    id: "airindia-flight",
+    type: "flight",
+    title: "Premium Economy",
+    provider: "Air India",
+    label: "Air India Flight",
+    amount: "₹6500",
+    duration: "2h 30m",
+    comfort: "★★★★★",
+    image:
+      "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad",
+    mode: "flight" as TransportMode,
+    highlights: [
+      "Meal included",
+      "Extra baggage",
+      "Premium seating",
+    ],
+  },
+
+  // 🚆 TRAINS
+  {
+    id: "train-sleeper",
     type: "train",
-    title: "Train",
+    title: "Sleeper Class",
     provider: "Goa Express",
-    label: "Goa Express",
-    amount: "₹1250",
+    label: "Sleeper Class",
+    amount: "₹850",
     duration: "14h",
+    comfort: "★★★☆☆",
+    image:
+      "https://images.unsplash.com/photo-1474487548417-781cb71495f3",
     mode: "roadtrip" as TransportMode,
-    highlights: ["Most affordable", "Scenic route", "Sleeper available"],
+    highlights: [
+      "Budget friendly",
+      "Sleeping berths",
+      "Scenic journey",
+    ],
   },
+
   {
-    id: "bus",
-    type: "bus",
-    title: "Bus",
-    provider: "Orange Travels",
-    label: "Orange Travels",
-    amount: "₹1800",
-    duration: "12h",
+    id: "train-3a",
+    type: "train",
+    title: "AC 3 Tier",
+    provider: "Goa Express",
+    label: "AC 3 Tier",
+    amount: "₹1650",
+    duration: "14h",
+    comfort: "★★★★☆",
+    image:
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
     mode: "roadtrip" as TransportMode,
-    highlights: ["AC Seater", "Multiple stops", "Frequent departures"],
+    highlights: [
+      "Air conditioned",
+      "Comfortable berths",
+      "Popular choice",
+    ],
+  },
+
+  {
+    id: "train-2a",
+    type: "train",
+    title: "AC 2 Tier",
+    provider: "Goa Express",
+    label: "AC 2 Tier",
+    amount: "₹2450",
+    duration: "14h",
+    comfort: "★★★★★",
+    image:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "More privacy",
+      "Spacious berths",
+      "Premium comfort",
+    ],
+  },
+
+  {
+    id: "train-1a",
+    type: "train",
+    title: "First AC",
+    provider: "Goa Express",
+    label: "First AC",
+    amount: "₹4200",
+    duration: "14h",
+    comfort: "★★★★★",
+    image:
+      "https://images.unsplash.com/photo-1514565131-fce0801e5785",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Luxury cabins",
+      "Maximum privacy",
+      "Premium service",
+    ],
+  },
+
+  // 🚌 BUSES
+  {
+    id: "bus-seater",
+    type: "bus",
+    title: "Seater",
+    provider: "Orange Travels",
+    label: "Seater Bus",
+    amount: "₹900",
+    duration: "12h",
+    comfort: "★★★☆☆",
+    image:
+      "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Lowest fare",
+      "Reclining seats",
+      "Frequent departures",
+    ],
+  },
+
+  {
+    id: "bus-semisleeper",
+    type: "bus",
+    title: "Semi Sleeper",
+    provider: "Orange Travels",
+    label: "Semi Sleeper Bus",
+    amount: "₹1200",
+    duration: "12h",
+    comfort: "★★★★☆",
+    image:
+      "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Extra legroom",
+      "Comfortable journey",
+      "AC coach",
+    ],
+  },
+
+  {
+    id: "bus-sleeper",
+    type: "bus",
+    title: "Sleeper",
+    provider: "Orange Travels",
+    label: "Sleeper Bus",
+    amount: "₹1600",
+    duration: "12h",
+    comfort: "★★★★☆",
+    image:
+      "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Sleeping berth",
+      "Ideal for overnight travel",
+      "AC coach",
+    ],
+  },
+
+  {
+    id: "bus-acsleeper",
+    type: "bus",
+    title: "AC Sleeper",
+    provider: "VRL Travels",
+    label: "AC Sleeper Bus",
+    amount: "₹2200",
+    duration: "12h",
+    comfort: "★★★★★",
+    image:
+      "https://images.unsplash.com/photo-1489515217757-5fd1be406fef",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Premium comfort",
+      "Blanket provided",
+      "Less travel fatigue",
+    ],
+  },
+
+  {
+    id: "bus-volvo",
+    type: "bus",
+    title: "Volvo Multi-Axle",
+    provider: "SRS Travels",
+    label: "Volvo Sleeper",
+    amount: "₹2800",
+    duration: "11h",
+    comfort: "★★★★★",
+    image:
+      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+    mode: "roadtrip" as TransportMode,
+    highlights: [
+      "Luxury coach",
+      "Smooth ride",
+      "Best bus experience",
+    ],
   },
 ] as const;
 
@@ -275,6 +596,10 @@ export function TripDashboardScreen({
   
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<HotelRecommendation | null>(null);
+  const [selectedTransport, setSelectedTransport] =
+  useState<(typeof travelOptions)[number] | null>(null);
+  const [selectedActivity, setSelectedActivity] =
+  useState<(typeof activities)[number] | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
   const [expenseTitle, setExpenseTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
@@ -317,6 +642,15 @@ React.useEffect(() => {
   const hotels = useMemo(() => (trip ? getHotelsForTrip(trip) : []), [trip]);
   
   const transfers = useMemo(() => (trip ? getTransportForTrip(trip) : []), [trip]);
+  const activities = useMemo(() => {
+  const city =
+    trip?.destination?.toLowerCase() ?? "";
+
+  return (
+    activitiesByCity[city] ??
+    activitiesByCity["ooty"]
+  );
+}, [trip]);
 
   const filteredTravelOptions = useMemo(
     () => travelOptions.filter(o => o.mode === transportMode),
@@ -334,10 +668,16 @@ React.useEffect(() => {
   const totalTravelers = trip ? trip.adults + trip.children + trip.seniors : 0;
   const confirmed = expenses.filter(e => e.category === "Confirmed");
   const manual = expenses.filter(e => e.category === "Manual");
-  const savedTotalSpend = expenses.reduce(
-    (acc, e) => acc + (parseInt(e.amount.replace(/[^\d.-]/g, ""), 10) || 0),
-    0
-  );
+  const parseAmount = (amount: string) => {
+  const cleaned = amount.replace(/[^\d]/g, "");
+
+  return cleaned ? Number(cleaned) : 0;
+};
+
+const savedTotalSpend = expenses.reduce(
+  (acc, e) => acc + parseAmount(e.amount),
+  0
+);
   const savedTotalSpendLabel = `₹${savedTotalSpend.toLocaleString("en-IN")}`;
   const displayedTripCost = expenses.length > 0 ? savedTotalSpendLabel : trip?.cost || savedTotalSpendLabel;
 
@@ -420,6 +760,28 @@ React.useEffect(() => {
     setBookingId(null);
   }
 };
+const handleBookActivity = async (
+  activity: (typeof activities)[number]
+) => {
+  if (!trip || !auth.currentUser) return;
+
+  try {
+    await addExpense({
+      tripId: trip.id,
+      userId: auth.currentUser.uid,
+      label: activity.name,
+      amount: activity.price,
+      category: "Confirmed",
+      expenseType: "activity",
+    });
+
+    setConfirmationMessage(
+      `🎉 Activity booked!\n\n${activity.name}`
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleAddManualExpense = async () => {
     if (!trip || !auth.currentUser || !expenseTitle || !expenseAmount) return;
@@ -446,6 +808,34 @@ React.useEffect(() => {
       setSavingExpense(false);
     }
   };
+  const handleBookTransfer = async (
+  transfer: (typeof transfers)[number]
+) => {
+  if (!trip || !auth.currentUser) return;
+
+  try {
+    const maxFare =
+  Math.max(
+    ...(transfer.taxiCost.match(/\d+/g) || [])
+      .map(Number)
+  );
+    
+    await addExpense({
+      tripId: trip.id,
+      userId: auth.currentUser.uid,
+      label: `${transfer.from} → ${transfer.to}`,
+      amount: `₹${maxFare}`,
+      category: "Confirmed",
+      expenseType: "transfer",
+    });
+
+    setConfirmationMessage(
+  `🚕 Transfer Added Successfully!\n\n${transfer.from} → ${transfer.to}\n\nEstimated Cost: ₹${maxFare}`
+);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleSaveTrip = async () => {
     if (!trip || !auth.currentUser) return;
@@ -465,17 +855,30 @@ React.useEffect(() => {
     }
   };
 
-  const handleDeleteManualExpense = async (expenseId: string) => {
-    setDeletingExpenseId(expenseId);
-    try {
-      await deleteExpense(expenseId);
-    } catch (err) {
-      console.error("[TripLens] Failed to delete manual expense:", err);
-      alert("Could not delete expense. Check Firestore rules and try again.");
-    } finally {
-      setDeletingExpenseId(null);
-    }
-  };
+  const handleDeleteExpense = async (expenseId: string) => {
+  const confirmed = window.confirm(
+    "Do you really want to delete this expense?"
+  );
+
+  if (!confirmed) return;
+
+  setDeletingExpenseId(expenseId);
+
+  try {
+    await deleteExpense(expenseId);
+  } catch (err) {
+    console.error(
+      "[TripLens] Failed to delete expense:",
+      err
+    );
+
+    alert(
+      "Could not delete expense."
+    );
+  } finally {
+    setDeletingExpenseId(null);
+  }
+};
 
   if (loading) {
     return (
@@ -750,7 +1153,13 @@ React.useEffect(() => {
                 </p>
               )}
               {filteredTravelOptions.map(option => (
-                <SectionCard key={option.id} style={{ padding: 16 }}>
+               <SectionCard
+  onClick={() => setSelectedTransport(option)}
+  style={{
+    padding: 16,
+    cursor: "pointer",
+  }}
+>
                   <div
                     style={{
                       display: "flex",
@@ -809,7 +1218,10 @@ React.useEffect(() => {
                   )}
 
                   <button
-                    onClick={() => handleBookTravelOption(option)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBookTravelOption(option);
+                    }}
                     disabled={bookingId === option.id}
                     style={{
                       width: "100%",
@@ -855,6 +1267,90 @@ React.useEffect(() => {
         ))}
           </div>
         )}
+        {tab === "activities" && (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }}
+  >
+    {activities.map(activity => (
+      <SectionCard
+  onClick={() => setSelectedActivity(activity)}
+  style={{
+    padding: 16,
+    cursor: "pointer",
+  }}
+>
+  <img
+  src={activity.image}
+  alt={activity.name}
+  style={{
+    width: "100%",
+    height: 180,
+    objectFit: "cover",
+    borderRadius: 12,
+    marginBottom: 12,
+  }}
+/>
+        <p
+          style={{
+            ...heading,
+            fontSize: 16
+          }}
+        >
+          {activity.name}
+          <p
+  style={{
+    ...body,
+    color: "#f59e0b",
+    marginTop: 4,
+  }}
+>
+  ⭐ {activity.rating}
+</p>
+        </p>
+
+        <p style={{ ...body }}>
+          {activity.description}
+        </p>
+
+        <p
+          style={{
+            ...body,
+            marginTop: 8
+          }}
+        >
+          {activity.duration}
+        </p>
+
+        <AmountPill
+          value={activity.price}
+        />
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleBookActivity(activity);
+          }}
+          style={{
+            width: "100%",
+            marginTop: 12,
+            padding: 12,
+            borderRadius: 12,
+            border: "none",
+            background: T.teal,
+            color: "white",
+            cursor: "pointer"
+          }}
+        >
+          Add Activity
+        </button>
+      </SectionCard>
+    ))}
+  </div>
+)}
 
         {/* ───── TRANSFERS TAB ───── */}
         {tab === "transfers" && (
@@ -916,7 +1412,24 @@ React.useEffect(() => {
                   }}
                 >
                   {route.note}
+                
                 </p>
+                <button
+  onClick={() => handleBookTransfer(route)}
+  style={{
+    width: "100%",
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    border: "none",
+    background: T.navy,
+    color: "white",
+    cursor: "pointer",
+  }}
+>
+  Add Transfer Expense
+</button>
+                
               </SectionCard>
             ))}
           </div>
@@ -1059,14 +1572,71 @@ React.useEffect(() => {
                 <p style={{ ...heading, fontSize: 16, color: T.navy, marginBottom: 10 }}>
                   Confirmed
                 </p>
-                {confirmed.map(e => (
-                  <SectionCard key={e.id} style={{ padding: 14, marginBottom: 8 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                      <p style={{ ...bodyMed, fontSize: 14, color: T.navy }}>{e.label}</p>
-                      <AmountPill value={e.amount} />
-                    </div>
-                  </SectionCard>
-                ))}
+               {confirmed.map(e => (
+  <SectionCard key={e.id} style={{ padding: 14, marginBottom: 8 }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        gap: 12,
+      }}
+    >
+      <div>
+        <p
+          style={{
+            ...bodyMed,
+            fontSize: 14,
+            color: T.navy,
+          }}
+        >
+          {e.label}
+        </p>
+
+        <p
+          style={{
+            ...body,
+            fontSize: 11,
+            color: T.slateL,
+            marginTop: 4,
+          }}
+        >
+          {formatExpenseDate(e.createdAt)}
+        </p>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: 8,
+        }}
+      >
+        <AmountPill value={e.amount} />
+
+        <button
+          onClick={() => handleDeleteExpense(e.id)}
+          disabled={deletingExpenseId === e.id}
+          style={{
+            width: 34,
+            height: 34,
+            borderRadius: "50%",
+            border: "1px solid rgba(239,68,68,0.18)",
+            background: "rgba(239,68,68,0.06)",
+            color: T.red,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: deletingExpenseId === e.id ? 0.6 : 1,
+          }}
+        >
+          <Trash2 size={15} />
+        </button>
+      </div>
+    </div>
+  </SectionCard>
+))}
               </div>
             )}
 
@@ -1097,7 +1667,7 @@ React.useEffect(() => {
                       >
                         <AmountPill value={e.amount} subtle />
                         <button
-                          onClick={() => handleDeleteManualExpense(e.id)}
+                          onClick={() => handleDeleteExpense(e.id)}
                           disabled={deletingExpenseId === e.id}
                           style={{
                             width: 34,
@@ -1190,6 +1760,7 @@ React.useEffect(() => {
           <p style={{ ...heading, fontSize: 16 }}>
             About this Hotel
           </p>
+          
 
           <p
             style={{
@@ -1251,6 +1822,265 @@ React.useEffect(() => {
           }}
         >
           Book This Hotel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{selectedTransport && (
+  <div
+    onClick={() => setSelectedTransport(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.7)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "flex-end",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        width: "100%",
+        maxHeight: "90vh",
+        overflowY: "auto",
+        background: "white",
+        borderRadius: "24px 24px 0 0",
+      }}
+    >
+      <img
+        src={selectedTransport.image}
+        alt={selectedTransport.title}
+        style={{
+          width: "100%",
+          height: 240,
+          objectFit: "cover",
+        }}
+      />
+
+      <div style={{ padding: 20 }}>
+        <h2
+          style={{
+            ...heading,
+            fontSize: 24,
+            color: T.navy,
+            marginBottom: 8,
+          }}
+        >
+          {selectedTransport.label}
+        </h2>
+
+        <p style={{ ...body, color: T.slate }}>
+          {selectedTransport.provider}
+        </p>
+
+        <p
+          style={{
+            ...heading,
+            fontSize: 20,
+            color: T.teal,
+            marginTop: 10,
+          }}
+        >
+          {selectedTransport.amount}
+        </p>
+
+        <p style={{ ...body, color: T.slate }}>
+          Duration: {selectedTransport.duration}
+        </p>
+
+        <p
+          style={{
+            marginTop: 12,
+            fontSize: 18,
+          }}
+        >
+          {selectedTransport.comfort}
+        </p>
+
+        <div style={{ marginTop: 20 }}>
+          <p style={{ ...heading, fontSize: 16 }}>
+            Highlights
+          </p>
+
+          {selectedTransport.highlights.map(item => (
+            <p
+              key={item}
+              style={{
+                ...body,
+                color: T.slate,
+                marginTop: 6,
+              }}
+            >
+              • {item}
+            </p>
+          ))}
+        </div>
+
+        <button
+          onClick={() =>
+            handleBookTravelOption(selectedTransport)
+          }
+          style={{
+            width: "100%",
+            marginTop: 24,
+            padding: 14,
+            borderRadius: 14,
+            border: "none",
+            background: T.navy,
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Book This Transport
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+{selectedActivity && (
+  <div
+    onClick={() => setSelectedActivity(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.7)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "flex-end",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        width: "100%",
+        maxHeight: "90vh",
+        overflowY: "auto",
+        background: "white",
+        borderRadius: "24px 24px 0 0",
+      }}
+    >
+      <img
+  src={selectedActivity.image}
+  alt={selectedActivity.name}
+  style={{
+    width: "100%",
+    height: 240,
+    objectFit: "cover",
+  }}
+/>
+      <div style={{ padding: 24 }}>
+        <h2
+          style={{
+            ...heading,
+            fontSize: 24,
+            color: T.navy,
+          }}
+        >
+          {selectedActivity.name}
+        </h2>
+
+        <p
+          style={{
+            ...heading,
+            color: T.teal,
+            marginTop: 10,
+          }}
+        >
+          {selectedActivity.price}
+        </p>
+
+        <p
+  style={{
+    ...body,
+    marginTop: 8,
+    color: T.slate,
+  }}
+>
+  ⭐ {selectedActivity.rating}
+</p>
+
+<p
+  style={{
+    ...body,
+    marginTop: 6,
+    color: T.slate,
+  }}
+>
+  Duration: {selectedActivity.duration}
+</p>
+
+        <div style={{ marginTop: 20 }}>
+          <p
+            style={{
+              ...heading,
+              marginBottom: 10,
+            }}
+          >
+            About this Activity
+          </p>
+
+          <p
+            style={{
+              ...body,
+              color: T.slate,
+              lineHeight: 1.6,
+            }}
+          >
+            {selectedActivity.description}
+          </p>
+        </div>
+
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <Chip
+            color={T.teal}
+            bg="rgba(20,184,166,0.08)"
+            border="rgba(20,184,166,0.18)"
+          >
+            📸 Great Photos
+          </Chip>
+
+          <Chip
+            color={T.teal}
+            bg="rgba(20,184,166,0.08)"
+            border="rgba(20,184,166,0.18)"
+          >
+            ⭐ Popular
+          </Chip>
+
+          <Chip
+            color={T.teal}
+            bg="rgba(20,184,166,0.08)"
+            border="rgba(20,184,166,0.18)"
+          >
+            🎟 Easy Booking
+          </Chip>
+        </div>
+
+        <button
+          onClick={() =>
+            handleBookActivity(selectedActivity)
+          }
+          style={{
+            width: "100%",
+            marginTop: 24,
+            padding: 14,
+            borderRadius: 14,
+            border: "none",
+            background: T.navy,
+            color: "white",
+            cursor: "pointer",
+          }}
+        >
+          Add Activity Expense
         </button>
       </div>
     </div>

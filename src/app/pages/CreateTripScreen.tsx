@@ -29,6 +29,11 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
   const [children, setChildren] = useState(0);
   const [seniors, setSeniors] = useState(0);
   const [loading, setLoading] = useState(false);
+  React.useEffect(() => {
+  if (tripType === "solo") {
+    setAdults(1);
+  }
+}, [tripType]);
 
   const totalTravelers = adults + children + seniors;
 
@@ -191,9 +196,35 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
             background: "white", borderRadius: 18, padding: "4px 16px",
             boxShadow: "0 2px 20px rgba(15,23,42,0.07)", border: `1px solid ${T.border}`,
           }}>
-            <GuestCounter label="Adults" sub="Age 18 and above" value={adults} onChange={setAdults} />
-            <GuestCounter label="Children" sub="Age 2 to 17 years" value={children} onChange={setChildren} />
-            <GuestCounter label="Seniors" sub="Age 60 and above" value={seniors} onChange={setSeniors} last />
+            <GuestCounter
+  label="Adults"
+  sub={
+    tripType === "solo"
+      ? "Solo trip (locked to 1)"
+      : "Age 18 and above"
+  }
+  value={adults}
+  onChange={(value) => {
+    if (tripType !== "solo") {
+      setAdults(value);
+    }
+  }}
+/>
+
+<GuestCounter
+  label="Children"
+  sub="Age 2 to 17 years"
+  value={children}
+  onChange={setChildren}
+/>
+
+<GuestCounter
+  label="Seniors"
+  sub="Age 60 and above"
+  value={seniors}
+  onChange={setSeniors}
+  last
+/>
           </div>
         </div>
 

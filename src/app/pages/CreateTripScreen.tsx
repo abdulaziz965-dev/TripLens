@@ -49,7 +49,7 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
     setLoading(true);
     try {
       const docRef = await createTrip({
-        userId: auth.currentUser.uid,
+        userId: auth.currentUser?.uid,
         name: tripName,
         destination,
         startDate,

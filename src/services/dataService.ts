@@ -102,9 +102,9 @@ export const subscribeToTrips = (userId: string, callback: (data: Trip[]) => voi
   // Simple single-field query — no composite index needed.
   // We sort client-side to avoid requiring a Firestore composite index.
   const q = query(
-    collection(db, "trips"),
-    where("userId", "==", userId)
-  );
+  collection(db, "trips"),
+  where("userId", "==", userId)
+);
   return onSnapshot(q, (snapshot) => {
     const data = snapshot.docs
       .map(doc => ({ id: doc.id, ...doc.data() } as Trip))
@@ -134,8 +134,8 @@ export const subscribeToTrip = (tripId: string, callback: (trip: Trip | null) =>
   });
 };
 
-export const subscribeToTripExpenses = (tripId: string, callback: (data: Expense[]) => void) => {
-  const q = query(collection(db, "expenses"), where("tripId", "==", tripId));
+export const subscribeToTripExpenses = (tripId: string,userId: string, callback: (data: Expense[]) => void) => {
+  const q = query(collection(db, "expenses"), where("tripId", "==", tripId),where("userId", "==", userId));
   return onSnapshot(q, (snapshot) => {
     const data = snapshot.docs
       .map(d => ({ id: d.id, ...d.data() } as Expense))
@@ -148,6 +148,26 @@ export const subscribeToTripExpenses = (tripId: string, callback: (data: Expense
   }, (error) => {
     console.error("[TripLens] subscribeToTripExpenses error:", error.code, error.message);
     callback([]);
+  });
+};
+export const subscribeToPlannedActivities = (
+  tripId: string,
+  userId: string,
+  callback: (data: any[]) => void
+) => {
+  const q = query(
+    collection(db, "plannedActivities"),
+    where("tripId", "==", tripId),
+    where("userId", "==", userId)
+  );
+
+  return onSnapshot(q, snapshot => {
+    callback(
+      snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+    );
   });
 };
 
@@ -181,6 +201,24 @@ export const createTrip = async (trip: Omit<Trip, "id" | "createdAt">) => {
     createdAt: Timestamp.now()
   });
   return docRef;
+};
+export const addPlannedActivity = async (
+  data: {
+    tripId: string;
+    userId: string;
+    day: string;
+    activityId: string;
+    name: string;
+    price: string;
+  }
+) => {
+  return addDoc(
+    collection(db, "plannedActivities"),
+    {
+      ...data,
+      createdAt: Timestamp.now(),
+    }
+  );
 };
 
 export const addExpense = async (expense: Omit<Expense, "id" | "createdAt">) => {

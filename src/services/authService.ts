@@ -7,6 +7,9 @@ import {
 } from "firebase/auth";
 import { createUserDocument } from "./userService";
 import { auth } from "../firebase/config";
+import { sendEmailVerification } from "firebase/auth";
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
@@ -63,7 +66,7 @@ export async function loginWithGoogle() {
     console.log("[TravelLens][Auth] User document creation completed", {
       uid: result.user.uid,
     });
-
+    
     return result.user;
   } catch (error) {
     logFirebaseError("Google login or Firestore profile creation failed", error);
@@ -86,6 +89,20 @@ export async function registerWithEmail(
   email: string,
   password: string
 ) {
+  if (password.length < 8) {
+  throw new Error(
+    "Password must be at least 8 characters long."
+  );
+}
+
+const strongPassword =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+if (!strongPassword.test(password)) {
+  throw new Error(
+    "Password must contain uppercase, lowercase, and a number."
+  );
+}
   const result = await createUserWithEmailAndPassword(
     auth,
     email,
@@ -93,7 +110,8 @@ export async function registerWithEmail(
   );
 
   await createUserDocument(result.user);
-
+  await sendEmailVerification(result.user);
+  await signOut(auth);
   return result.user;
 }
 
@@ -101,11 +119,46 @@ export async function loginWithEmail(
   email: string,
   password: string
 ) {
-  const result = await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
+  const attempts =
+  Number(localStorage.getItem("loginAttempts")) || 0;
 
-  return result.user;
+if (attempts >= MAX_LOGIN_ATTEMPTS) {
+  throw new Error(
+    `Too many login attempts. Try again in ${LOCKOUT_MINUTES} minutes.`
+  );
+}
+  try {
+    const result =
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    await result.user.reload();
+
+    if (!result.user.emailVerified) {
+      await signOut(auth);
+
+      throw new Error(
+        "Please verify your email before logging in."
+      );
+    }
+
+    localStorage.removeItem("loginAttempts");
+
+    return result.user;
+  } catch (error) {
+    const attempts =
+      Number(
+        localStorage.getItem("loginAttempts")
+      ) || 0;
+
+    localStorage.setItem(
+      "loginAttempts",
+      String(attempts + 1)
+    );
+
+    throw error;
+  }
 }

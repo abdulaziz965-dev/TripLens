@@ -14,9 +14,15 @@ import { auth } from "../../firebase/config";
 import { T, display, body, heading, label, bodyMed } from "../theme";
 import { Chip, SectionCard, AmountPill } from "../components/SharedComponents";
 import { useTrip, useTripExpenses } from "../hooks/useRealtime";
-import { addExpense, deleteExpense, updateTrip } from "../../services/dataService";
+"../../services/dataService";
 import { getActivities } from "../../services/geoapify";
-
+import {
+  addExpense,
+  addPlannedActivity,
+  deleteExpense,
+  updateTrip,
+  subscribeToPlannedActivities
+} from "../../services/dataService";
 import {
   getHotelsForTrip,
   getTransportForTrip,
@@ -683,10 +689,6 @@ const activityRating =
 
 const activityDuration =
   selectedActivity?.duration ?? "Flexible";
-
-const activityCategory =
-  selectedActivity?.properties?.categories?.[0] ??
-  "Tourist Attraction";
   const [expenseTitle, setExpenseTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
@@ -694,6 +696,30 @@ const activityCategory =
   const [dayPlans, setDayPlans] = useState<
   Record<string, any[]>
 >({});
+useEffect(() => {
+  if (!trip || !auth.currentUser) return;
+
+  const unsubscribe =
+    subscribeToPlannedActivities(
+      trip.id,
+      auth.currentUser.uid,
+      (items) => {
+        const plans: Record<string, any[]> = {};
+
+        items.forEach(item => {
+          if (!plans[item.day]) {
+            plans[item.day] = [];
+          }
+
+          plans[item.day].push(item);
+        });
+
+        setDayPlans(plans);
+      }
+    );
+
+  return unsubscribe;
+}, [trip]);
 
 const [selectedDay, setSelectedDay] =
   useState<string | null>(null);
@@ -830,7 +856,7 @@ const savedTotalSpend = expenses.reduce(
 
     await addExpense({
       tripId: trip.id,
-      userId: auth.currentUser.uid,
+      userId: auth.currentUser!.uid,
       label: `${hotel.name} (${hotel.roomsRequired} room${
         hotel.roomsRequired > 1 ? "s" : ""
       })`,
@@ -866,7 +892,7 @@ const savedTotalSpend = expenses.reduce(
   try {
     await addExpense({
       tripId: trip.id,
-      userId: auth.currentUser.uid,
+      userId: auth.currentUser!.uid,
       label: option.label,
       amount: option.amount,
       category: "Confirmed",
@@ -891,11 +917,10 @@ const handleBookActivity = async (
   activity: (typeof activities)[number]
 ) => {
   if (!trip || !auth.currentUser) return;
-
   try {
     await addExpense({
       tripId: trip.id,
-      userId: auth.currentUser.uid,
+      userId: auth.currentUser!.uid,
       label:
   activity.name ??
   activity.properties?.name ??
@@ -929,7 +954,7 @@ setConfirmationMessage(
         : `₹${parseInt(expenseAmount, 10).toLocaleString("en-IN")}`;
       await addExpense({
         tripId: trip.id,
-        userId: auth.currentUser.uid,
+        userId: auth.currentUser!.uid,
         label: expenseTitle,
         amount,
         category: "Manual",
@@ -959,7 +984,7 @@ setConfirmationMessage(
     
     await addExpense({
       tripId: trip.id,
-      userId: auth.currentUser.uid,
+      userId: auth.currentUser!.uid,
       label: `${transfer.from} → ${transfer.to}`,
       amount: `₹${maxFare}`,
       category: "Confirmed",
@@ -1575,20 +1600,26 @@ setConfirmationMessage(
 
       <button
   disabled={alreadyAdded}
-  onClick={(e) => {
+  onClick={async (e) => {
     e.stopPropagation();
 
     if (!selectedDay || alreadyAdded) return;
 
-    setDayPlans(prev => ({
-      ...prev,
-      [selectedDay]: [
-        ...(prev[selectedDay] || []),
-        activity,
-      ],
-    }));
+  await addPlannedActivity({
+  tripId: trip.id,
+  userId: auth.currentUser!.uid,
+  day: selectedDay,
+  activityId: activity.id,
+  name:
+    activity.name ??
+    activity.properties?.name ??
+    "Activity",
+  price:
+    activity.price ??
+    "₹0",
+});
 
-    handleBookActivity(activity);
+await handleBookActivity(activity);
 
     setShowActivityPicker(false);
   }}

@@ -95,10 +95,14 @@ export function useTripExpenses(tripId: string | undefined, userId: string | und
       return;
     }
 
-    const unsubscribe = subscribeToTripExpenses(tripId, (items) => {
-      setData(items);
-      setLoading(false);
-    });
+   const unsubscribe = subscribeToTripExpenses(
+  tripId,
+  userId,
+  (items) => {
+    setData(items);
+    setLoading(false);
+  }
+);
     return () => unsubscribe();
   }, [tripId, userId]);
 

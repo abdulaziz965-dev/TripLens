@@ -1,8 +1,7 @@
-import React from "react";
 import { Briefcase, Plus } from "lucide-react";
 import { auth } from "../../firebase/config";
 import { T, display, body, heading, bodyMed } from "../theme";
-import { StatusBar, SectionCard, BottomTabBar, Chip, AmountPill } from "../components/SharedComponents";
+import { SectionCard, BottomTabBar, Chip, AmountPill } from "../components/SharedComponents";
 import { useTrips } from "../hooks/useRealtime";
 
 export function TripsScreen({ onCreateTrip, onSelectTrip }: { onCreateTrip: () => void; onSelectTrip: (trip: any) => void }) {

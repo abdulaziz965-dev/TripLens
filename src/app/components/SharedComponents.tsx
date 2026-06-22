@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Briefcase, DollarSign, User, MapPin, Clock, Star, ChevronRight, CheckCircle, AlertTriangle, Info, Plus, Minus, Phone, Shield, Eye, Zap, ReceiptText, Settings, BadgeCheck, LogOut, Search, TrendingUp, Calendar, ArrowRight, ChevronLeft } from "lucide-react";
-import { T, bodyMed, heading, body, label, subhead, display } from "../theme";
+import { Home, Briefcase, DollarSign, User, Plus, Minus } from "lucide-react";
+import { T, bodyMed, body, subhead, display } from "../theme";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared micro-components

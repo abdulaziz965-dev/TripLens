@@ -1,18 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect
+} from "react";
 import {
   ChevronLeft, MapPin, Calendar, Users, Hotel, Car, Wallet,
   Star, CheckCircle, AlertTriangle, Plus, X, Trash2, Plane,
 } from "lucide-react";
 import {
-  Timestamp,
-  doc,
-  getDoc
+  Timestamp
 } from "firebase/firestore";
-import { auth,db } from "../../firebase/config";
-import { T, display, body, heading, label, bodyMed, subhead } from "../theme";
-import { StatusBar, Chip, SectionCard, AmountPill } from "../components/SharedComponents";
+import { auth } from "../../firebase/config";
+import { T, display, body, heading, label, bodyMed } from "../theme";
+import { Chip, SectionCard, AmountPill } from "../components/SharedComponents";
 import { useTrip, useTripExpenses } from "../hooks/useRealtime";
 import { addExpense, deleteExpense, updateTrip } from "../../services/dataService";
+import { getActivities } from "../../services/geoapify";
 
 import {
   getHotelsForTrip,
@@ -206,6 +209,10 @@ const travelOptions = [
     amount: "₹5800",
     duration: "2h 15m",
     comfort: "★★★★☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1436491865332-7a61a109cc05",
     mode: "flight" as TransportMode,
@@ -225,6 +232,10 @@ const travelOptions = [
     amount: "₹6500",
     duration: "2h 30m",
     comfort: "★★★★★",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad",
     mode: "flight" as TransportMode,
@@ -245,6 +256,10 @@ const travelOptions = [
     amount: "₹850",
     duration: "14h",
     comfort: "★★★☆☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1474487548417-781cb71495f3",
     mode: "roadtrip" as TransportMode,
@@ -264,6 +279,10 @@ const travelOptions = [
     amount: "₹1650",
     duration: "14h",
     comfort: "★★★★☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
     mode: "roadtrip" as TransportMode,
@@ -283,6 +302,10 @@ const travelOptions = [
     amount: "₹2450",
     duration: "14h",
     comfort: "★★★★★",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
     mode: "roadtrip" as TransportMode,
@@ -302,6 +325,10 @@ const travelOptions = [
     amount: "₹4200",
     duration: "14h",
     comfort: "★★★★★",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1514565131-fce0801e5785",
     mode: "roadtrip" as TransportMode,
@@ -322,6 +349,10 @@ const travelOptions = [
     amount: "₹900",
     duration: "12h",
     comfort: "★★★☆☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957",
     mode: "roadtrip" as TransportMode,
@@ -341,6 +372,10 @@ const travelOptions = [
     amount: "₹1200",
     duration: "12h",
     comfort: "★★★★☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
     mode: "roadtrip" as TransportMode,
@@ -360,6 +395,10 @@ const travelOptions = [
     amount: "₹1600",
     duration: "12h",
     comfort: "★★★★☆",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1517760444937-f6397edcbbcd",
     mode: "roadtrip" as TransportMode,
@@ -379,6 +418,10 @@ const travelOptions = [
     amount: "₹2200",
     duration: "12h",
     comfort: "★★★★★",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1489515217757-5fd1be406fef",
     mode: "roadtrip" as TransportMode,
@@ -398,6 +441,10 @@ const travelOptions = [
     amount: "₹2800",
     duration: "11h",
     comfort: "★★★★★",
+    recommendedFor: [
+    "Families",
+    "Budget Travelers"
+  ],
     image:
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
     mode: "roadtrip" as TransportMode,
@@ -580,6 +627,14 @@ function HotelCard({
     </SectionCard>
   );
 }
+function toTitleCase(text: string) {
+  return text.replace(
+    /\w\S*/g,
+    word =>
+      word.charAt(0).toUpperCase() +
+      word.slice(1).toLowerCase()
+  );
+}
 
 export function TripDashboardScreen({
   tripId,
@@ -594,68 +649,140 @@ export function TripDashboardScreen({
   const [tab, setTab] = useState<DashboardTab>("transport");
   const [transportMode, setTransportMode] = useState<TransportMode>("roadtrip");
   
+  const filteredTravelOptions = useMemo(
+    () => travelOptions.filter(o => o.mode === transportMode),
+    [transportMode]
+  );
+  
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [selectedHotel, setSelectedHotel] = useState<HotelRecommendation | null>(null);
   const [selectedTransport, setSelectedTransport] =
   useState<(typeof travelOptions)[number] | null>(null);
   const [selectedActivity, setSelectedActivity] =
-  useState<(typeof activities)[number] | null>(null);
+  useState<Record<string, any> | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
+const activityName = toTitleCase(
+  selectedActivity?.name ??
+  selectedActivity?.properties?.name ??
+  "Tourist Attraction"
+);
+const activityDescription =
+  selectedActivity?.description ??
+  selectedActivity?.properties?.formatted ??
+  "Popular attraction";
+
+const activityImage =
+  selectedActivity?.image ??
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
+
+const activityPrice =
+  selectedActivity?.price ?? "Free";
+
+const activityRating =
+  selectedActivity?.rating ?? "4.5";
+
+const activityDuration =
+  selectedActivity?.duration ?? "Flexible";
+
+const activityCategory =
+  selectedActivity?.properties?.categories?.[0] ??
+  "Tourist Attraction";
   const [expenseTitle, setExpenseTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [dayPlans, setDayPlans] = useState<
+  Record<string, any[]>
+>({});
+
+const [selectedDay, setSelectedDay] =
+  useState<string | null>(null);
+
+const [showActivityPicker, setShowActivityPicker] =
+  useState(false);
+
   const [expenseType, setExpenseType] = useState<(typeof MANUAL_TYPES)[number]["id"]>("food");
   const [savingExpense, setSavingExpense] = useState(false);
   const [savingTrip, setSavingTrip] = useState(false);
   const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState("Traveler");
-
-React.useEffect(() => {
-  const loadProfile = async () => {
-    const user = auth.currentUser;
-
-    if (!user) return;
+   useEffect(() => {
+  const loadActivities = async () => {
+    if (!trip?.destination) return;
 
     try {
-      const snap = await getDoc(
-        doc(db, "users", user.uid)
+      
+
+      const data = await getActivities(
+        trip.destination
       );
+      console.log("Activities API:",data);
 
-      if (snap.exists()) {
-        const data = snap.data();
+      if (data.length > 0) {
+        setActivities(data);
+      } else {
+        const city =
+  trip.destination
+    .split(",")[0]
+    .trim()
+    .toLowerCase();
 
-        setDisplayName(
-          data.displayName ||
-          user.displayName ||
-          user.email?.split("@")[0] ||
-          "Traveler"
+        setActivities(
+          activitiesByCity[city] ??
+          activitiesByCity["ooty"]
         );
       }
     } catch (err) {
       console.error(err);
+
+      const city =
+        trip.destination
+          .split(",")[0]
+          .trim()
+          .toLowerCase();
+
+      setActivities(
+        activitiesByCity[city] ??
+        activitiesByCity["ooty"]
+      );
+    } finally {
+      
     }
   };
 
-  loadProfile();
-}, []);
-
-  const hotels = useMemo(() => (trip ? getHotelsForTrip(trip) : []), [trip]);
-  
-  const transfers = useMemo(() => (trip ? getTransportForTrip(trip) : []), [trip]);
-  const activities = useMemo(() => {
-  const city =
-    trip?.destination?.toLowerCase() ?? "";
-
-  return (
-    activitiesByCity[city] ??
-    activitiesByCity["ooty"]
-  );
+  loadActivities();
 }, [trip]);
 
-  const filteredTravelOptions = useMemo(
-    () => travelOptions.filter(o => o.mode === transportMode),
-    [transportMode]
+  const hotels = useMemo(
+  () => (trip ? getHotelsForTrip(trip) : []),
+  [trip]
+);
+const transfers = useMemo(() => (trip ? getTransportForTrip(trip) : []), [trip]);
+
+const tripDays = useMemo(() => {
+  if (!trip?.startDate || !trip?.endDate) {
+    return ["Day 1"];
+  }
+
+ 
+  
+  
+ 
+
+
+  const start = new Date(trip.startDate);
+  const end = new Date(trip.endDate);
+
+  const totalDays =
+    Math.ceil(
+      (end.getTime() - start.getTime()) /
+      (1000 * 60 * 60 * 24)
+    ) + 1;
+
+  return Array.from(
+    { length: totalDays },
+    (_, i) => `Day ${i + 1}`
   );
+}, [trip]);
 
   const nights = useMemo(() => {
     if (!trip?.startDate || !trip?.endDate) return 3;
@@ -769,15 +896,25 @@ const handleBookActivity = async (
     await addExpense({
       tripId: trip.id,
       userId: auth.currentUser.uid,
-      label: activity.name,
-      amount: activity.price,
+      label:
+  activity.name ??
+  activity.properties?.name ??
+  "Activity",
+      amount:
+  activity.price ??
+  "₹0",
       category: "Confirmed",
       expenseType: "activity",
     });
 
-    setConfirmationMessage(
-      `🎉 Activity booked!\n\n${activity.name}`
-    );
+    const activityName =
+  activity.name ??
+  activity.properties?.name ??
+  "Activity";
+
+setConfirmationMessage(
+  `🎉 Activity booked!\n\n${activityName}`
+);
   } catch (err) {
     console.error(err);
   }
@@ -1268,87 +1405,215 @@ const handleBookActivity = async (
           </div>
         )}
         {tab === "activities" && (
+          
   <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: 12
-    }}
-  >
-    {activities.map(activity => (
-      <SectionCard
-  onClick={() => setSelectedActivity(activity)}
   style={{
-    padding: 16,
-    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    gap: 12
   }}
 >
-  <img
-  src={activity.image}
-  alt={activity.name}
-  style={{
-    width: "100%",
-    height: 180,
-    objectFit: "cover",
-    borderRadius: 12,
-    marginBottom: 12,
-  }}
-/>
-        <p
-          style={{
-            ...heading,
-            fontSize: 16
-          }}
-        >
-          {activity.name}
-          <p
-  style={{
-    ...body,
-    color: "#f59e0b",
-    marginTop: 4,
-  }}
->
-  ⭐ {activity.rating}
-</p>
+  <SectionCard style={{ padding: 16 }}>
+    <p
+      style={{
+        ...heading,
+        marginBottom: 16,
+      }}
+    >
+      🗓️ Plan Your Days
+    </p>
+
+    {tripDays.map(day => (
+      <div
+        key={day}
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          borderRadius: 12,
+          background: "#f8fafc",
+        }}
+      >
+        <p style={heading}>
+          {day}
         </p>
 
-        <p style={{ ...body }}>
-          {activity.description}
-        </p>
-
-        <p
-          style={{
-            ...body,
-            marginTop: 8
-          }}
-        >
-          {activity.duration}
-        </p>
-
-        <AmountPill
-          value={activity.price}
-        />
+        {(dayPlans[day] || []).length === 0 ? (
+          <p style={body}>
+            No activities planned
+          </p>
+        ) : (
+          dayPlans[day].map(activity => (
+            <p key={activity.id}>
+              • {activity.name}
+            </p>
+          ))
+        )}
 
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleBookActivity(activity);
-          }}
-          style={{
-            width: "100%",
-            marginTop: 12,
-            padding: 12,
-            borderRadius: 12,
-            border: "none",
-            background: T.teal,
-            color: "white",
-            cursor: "pointer"
-          }}
-        >
-          Add Activity
-        </button>
-      </SectionCard>
+  onClick={() => {
+    setSelectedDay(day);
+    setShowActivityPicker(true);
+  }}
+>
+  Add Activity
+</button>
+      </div>
     ))}
+  </SectionCard>
+   {showActivityPicker &&
+  activities.map((activity, index) => {
+    const alreadyAdded = Object.values(dayPlans)
+  .flat()
+  .some(
+    item =>
+      item.id === activity.id
+  );
+  const isApiActivity =
+    !!activity.properties;
+
+  const name = toTitleCase(
+  activity.name ??
+  activity.properties?.name ??
+  "Tourist Attraction"
+);
+
+  const description =
+    activity.description ??
+    activity.properties?.formatted ??
+    "Popular attraction in this destination.";
+
+  const category = toTitleCase(
+  (
+    activity.properties?.categories?.[0] ??
+    "Attraction"
+  )
+    .replace(".", " ")
+    .replace("_", " ")
+);
+  const rating =
+    activity.rating ?? "4.5";
+
+  const image =
+    activity.image ??
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
+
+  return (
+    <SectionCard
+      key={activity.id ?? index}
+      onClick={() => setSelectedActivity(activity)}
+      style={{
+        padding: 16,
+        cursor: "pointer",
+      }}
+    >
+      <img
+        src={image}
+        alt={name}
+        style={{
+          width: "100%",
+          height: 180,
+          objectFit: "cover",
+          borderRadius: 12,
+          marginBottom: 12,
+        }}
+      />
+
+      <p
+        style={{
+          ...heading,
+          fontSize: 16,
+        }}
+      >
+        {name}
+      </p>
+
+      <p
+        style={{
+          ...body,
+          color: "#f59e0b",
+          marginTop: 4,
+        }}
+      >
+        ⭐ {rating}
+      </p>
+
+      <p
+        style={{
+          ...body,
+          marginTop: 8,
+        }}
+      >
+        {description}
+      </p>
+
+      <p
+        style={{
+          ...body,
+          marginTop: 8,
+          color: T.teal,
+        }}
+      >
+        {category}
+      </p>
+
+      {!isApiActivity && (
+        <>
+          <p
+            style={{
+              ...body,
+              marginTop: 8,
+            }}
+          >
+            {activity.duration}
+          </p>
+
+          <AmountPill
+            value={activity.price}
+          />
+        </>
+      )}
+
+      <button
+  disabled={alreadyAdded}
+  onClick={(e) => {
+    e.stopPropagation();
+
+    if (!selectedDay || alreadyAdded) return;
+
+    setDayPlans(prev => ({
+      ...prev,
+      [selectedDay]: [
+        ...(prev[selectedDay] || []),
+        activity,
+      ],
+    }));
+
+    handleBookActivity(activity);
+
+    setShowActivityPicker(false);
+  }}
+  style={{
+    width: "100%",
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    border: "none",
+    background: alreadyAdded
+      ? "#94a3b8"
+      : T.teal,
+    color: "white",
+    cursor: alreadyAdded
+      ? "not-allowed"
+      : "pointer",
+  }}
+>
+  {alreadyAdded
+    ? "Already Planned"
+    : "Add Activity"}
+</button>
+    </SectionCard>
+  );
+})}
   </div>
 )}
 
@@ -1874,6 +2139,13 @@ const handleBookActivity = async (
         <p style={{ ...body, color: T.slate }}>
           {selectedTransport.provider}
         </p>
+        <Chip
+  color={T.teal}
+  bg="rgba(20,184,166,0.08)"
+  border="rgba(20,184,166,0.18)"
+>
+  {selectedTransport.type.toUpperCase()}
+</Chip>
 
         <p
           style={{
@@ -1890,14 +2162,32 @@ const handleBookActivity = async (
           Duration: {selectedTransport.duration}
         </p>
 
-        <p
-          style={{
-            marginTop: 12,
-            fontSize: 18,
-          }}
-        >
-          {selectedTransport.comfort}
-        </p>
+        <div
+  style={{
+    marginTop: 16,
+    padding: 14,
+    borderRadius: 14,
+    background: "rgba(20,184,166,0.08)",
+  }}
+>
+  <p
+    style={{
+      ...label,
+      color: T.slate,
+      marginBottom: 6,
+    }}
+  >
+    Comfort Rating
+  </p>
+
+  <p
+    style={{
+      fontSize: 22,
+    }}
+  >
+    {selectedTransport.comfort}
+  </p>
+</div>
 
         <div style={{ marginTop: 20 }}>
           <p style={{ ...heading, fontSize: 16 }}>
@@ -1917,6 +2207,60 @@ const handleBookActivity = async (
             </p>
           ))}
         </div>
+        <div style={{ marginTop: 20 }}>
+  <p
+    style={{
+      ...heading,
+      fontSize: 16,
+    }}
+  >
+    Recommended For
+  </p>
+
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 8,
+      marginTop: 10,
+    }}
+  >
+    {selectedTransport.recommendedFor?.map(
+      item => (
+        <Chip
+          key={item}
+          color={T.teal}
+          bg="rgba(20,184,166,0.08)"
+          border="rgba(20,184,166,0.18)"
+        >
+          ✓ {item}
+        </Chip>
+      )
+    )}
+  </div>
+</div>
+<div style={{ marginTop: 20 }}>
+  <p
+    style={{
+      ...heading,
+      fontSize: 16,
+    }}
+  >
+    Journey Insights
+  </p>
+
+  <p
+    style={{
+      ...body,
+      color: T.slate,
+      marginTop: 8,
+      lineHeight: 1.6,
+    }}
+  >
+    This travel option provides a comfortable balance
+    between affordability, convenience, and travel time.
+  </p>
+</div>
 
         <button
           onClick={() =>
@@ -1939,7 +2283,9 @@ const handleBookActivity = async (
     </div>
   </div>
 )}
+
 {selectedActivity && (
+  
   <div
     onClick={() => setSelectedActivity(null)}
     style={{
@@ -1962,8 +2308,8 @@ const handleBookActivity = async (
       }}
     >
       <img
-  src={selectedActivity.image}
-  alt={selectedActivity.name}
+  src={activityImage}
+  alt={activityName}
   style={{
     width: "100%",
     height: 240,
@@ -1978,7 +2324,7 @@ const handleBookActivity = async (
             color: T.navy,
           }}
         >
-          {selectedActivity.name}
+          {activityName}
         </h2>
 
         <p
@@ -1988,7 +2334,7 @@ const handleBookActivity = async (
             marginTop: 10,
           }}
         >
-          {selectedActivity.price}
+          {activityPrice}
         </p>
 
         <p
@@ -1998,7 +2344,7 @@ const handleBookActivity = async (
     color: T.slate,
   }}
 >
-  ⭐ {selectedActivity.rating}
+  ⭐ {activityRating}
 </p>
 
 <p
@@ -2008,7 +2354,7 @@ const handleBookActivity = async (
     color: T.slate,
   }}
 >
-  Duration: {selectedActivity.duration}
+  Duration: {activityDuration}
 </p>
 
         <div style={{ marginTop: 20 }}>
@@ -2028,7 +2374,7 @@ const handleBookActivity = async (
               lineHeight: 1.6,
             }}
           >
-            {selectedActivity.description}
+            {activityDescription}
           </p>
         </div>
 

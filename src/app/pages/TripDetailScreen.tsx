@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronLeft, MapPin, Calendar, Car, Hotel, Coffee, Info, ArrowUpRight, CheckCircle, Navigation } from "lucide-react";
 import { T, display, body, heading, label, bodyMed } from "../theme";
-import { StatusBar, Chip } from "../components/SharedComponents";
+import { Chip } from "../components/SharedComponents";
 
 interface DetailItemProps {
   icon: React.ReactNode;

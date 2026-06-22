@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, MapPin, Star, Clock, ArrowRight, CheckCircle, AlertTriangle, Info, TrendingUp, Plus } from "lucide-react";
 import { type User as FirebaseUser } from "firebase/auth";
 import { T, display, body, heading, label, bodyMed, IMG } from "../theme";
-import { Chip, StatusBar, BottomTabBar } from "../components/SharedComponents";
+import { Chip, BottomTabBar } from "../components/SharedComponents";
 import { useInsights, useTrips } from "../hooks/useRealtime";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";

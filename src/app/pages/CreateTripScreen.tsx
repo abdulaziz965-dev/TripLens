@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ChevronLeft, MapPin, Calendar, CheckCircle, Eye, ArrowRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { auth } from "../../firebase/config";
-import { T, display, body, heading, label, subhead } from "../theme";
+import { T, display, body, label, subhead } from "../theme";
 import { StatusBar, GuestCounter } from "../components/SharedComponents";
 import { createTrip } from "../../services/dataService";
 import { INDIAN_CITIES } from "../../data/indianCities";

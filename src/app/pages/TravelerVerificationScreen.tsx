@@ -31,7 +31,6 @@ export function TravelerVerificationScreen() {
 };
 const refreshVerification = async () => {
   await user?.reload();
-  const referencedUser = auth.currentUser;
   if (auth.currentUser?.emailVerified) {
     alert(
       "🎉 Email verified successfully!"

@@ -27,7 +27,6 @@ export function ProfileScreen({ user, onLogout }: { user: FirebaseUser | null; o
   const [displayName, setDisplayName] = React.useState("Traveler");
 
   const avatarText = displayName.charAt(0).toUpperCase();
-  const [activeModal, setActiveModal] = React.useState<string | null>(null);
   React.useEffect(() => {
   const loadProfile = async () => {
     if (!user) return;
@@ -168,8 +167,6 @@ const destinationsVisited = new Set(
     navigate("/verification");
   } else if (item.label === "Payment Methods") {
     navigate("/payments");
-  } else {
-    setActiveModal(item.label);
   }
 }}
 >

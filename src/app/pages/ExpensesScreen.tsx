@@ -1,8 +1,8 @@
-import React from "react";
+
 import { Wallet, CheckCircle, ReceiptText } from "lucide-react";
 import { auth } from "../../firebase/config";
 import { T, display, body, heading, label } from "../theme";
-import { StatusBar, SectionCard, BottomTabBar, AmountPill, Chip } from "../components/SharedComponents";
+import { SectionCard, BottomTabBar, AmountPill, Chip } from "../components/SharedComponents";
 import { useExpenses } from "../hooks/useRealtime";
 
 export function ExpensesScreen() {

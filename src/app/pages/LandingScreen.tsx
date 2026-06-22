@@ -1,7 +1,6 @@
-import React from "react";
 import { Bed, Car, CreditCard, ArrowRight, ChevronRight } from "lucide-react";
 import { T, display, body, heading, label, bodyMed, IMG, subhead } from "../theme";
-import { LogoMark, StatusBar } from "../components/SharedComponents";
+import { LogoMark } from "../components/SharedComponents";
 
 export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSignIn: () => void }) {
   const FEATURES = [

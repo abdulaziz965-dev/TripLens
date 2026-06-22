@@ -1,8 +1,8 @@
 
 import { Phone, Mail, Shield, Eye, Zap } from "lucide-react";
 import { T, display, body, heading, label, IMG } from "../theme";
-import { LogoMark, StatusBar } from "../components/SharedComponents";
-import React, { useState } from "react";
+import { LogoMark } from "../components/SharedComponents";
+import { useState } from "react";
 
 export function LoginScreen({
   onLogin,

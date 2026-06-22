@@ -29,6 +29,7 @@ import {
   getTripDurationLabel,
   type HotelRecommendation,
 } from "../../data/tripIntelligence";
+import { useNavigate } from "react-router-dom";
 
 type DashboardTab =
   | "transport"
@@ -336,7 +337,7 @@ const travelOptions = [
     "Budget Travelers"
   ],
     image:
-      "https://images.unsplash.com/photo-1514565131-fce0801e5785",
+      safeImage("https://images.unsplash.com/photo-1514565131-fce0801e5785"),
     mode: "roadtrip" as TransportMode,
     highlights: [
       "Luxury cabins",
@@ -468,7 +469,15 @@ const MANUAL_TYPES = [
   { id: "activities", label: "Activities" },
   { id: "miscellaneous", label: "Miscellaneous" },
 ] as const;
+function safeImage(url?: string) {
+  if (!url) {
+    return "/placeholder.jpg";
+  }
 
+  return /^https?:\/\//.test(url)
+    ? url
+    : "/placeholder.jpg";
+}
 function ConvenienceStars({ rating }: { rating: number }) {
   return (
     <div style={{ display: "flex", gap: 2 }}>
@@ -483,6 +492,7 @@ function ConvenienceStars({ rating }: { rating: number }) {
     </div>
   );
 }
+
 
 function HotelCard({
   hotel,
@@ -500,7 +510,7 @@ function HotelCard({
     <SectionCard style={{ overflow: "hidden" }}>
       <div style={{ position: "relative", height: 140 }}>
         <img
-          src={hotel.photos[0]}
+          src={safeImage(hotel.photos[0])}
           alt={hotel.name}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
@@ -649,7 +659,25 @@ export function TripDashboardScreen({
   tripId: string;
   onBack: () => void;
 }) {
+  const navigate = useNavigate();
   const { data: trip, loading } = useTrip(tripId);
+  useEffect(() => {
+  if (
+    trip &&
+    auth.currentUser &&
+    trip.userId !== auth.currentUser.uid
+  ) {
+    navigate("/trips");
+  }
+}, [trip, navigate]);
+
+
+
+useEffect(() => {
+  if (!loading && !trip) {
+    navigate("/trips");
+  }
+}, [loading, trip, navigate]);
   const { data: expenses } = useTripExpenses(tripId, auth.currentUser?.uid);
   
   const [tab, setTab] = useState<DashboardTab>("transport");
@@ -741,7 +769,7 @@ const [showActivityPicker, setShowActivityPicker] =
       const data = await getActivities(
         trip.destination
       );
-      console.log("Activities API:",data);
+      
 
       if (data.length > 0) {
         setActivities(data);
@@ -844,6 +872,17 @@ const savedTotalSpend = expenses.reduce(
   };
 
   const handleBookHotel = async (hotel: HotelRecommendation) => {
+    const alreadyBooked = expenses.some(
+  e =>
+    e.expenseType === "hotel" &&
+    e.label.includes(hotel.name)
+);
+
+if (alreadyBooked) {
+  alert("Hotel already booked.");
+  return;
+}
+    
   if (!trip || !auth.currentUser) return;
 
   setBookingId(hotel.id);
@@ -885,6 +924,16 @@ const savedTotalSpend = expenses.reduce(
  const handleBookTravelOption = async (
   option: (typeof travelOptions)[number]
 ) => {
+  const alreadyBooked = expenses.some(
+  e =>
+    e.expenseType === option.type &&
+    e.label === option.label
+);
+
+if (alreadyBooked) {
+  alert("Transport already booked.");
+  return;
+}
   if (!trip || !auth.currentUser) return;
 
   setBookingId(option.id);
@@ -952,6 +1001,21 @@ setConfirmationMessage(
       const amount = expenseAmount.startsWith("₹")
         ? expenseAmount
         : `₹${parseInt(expenseAmount, 10).toLocaleString("en-IN")}`;
+        if (expenseTitle.length > 100) {
+  alert("Title too long");
+  return;
+}
+
+const amountNumber = Number(expenseAmount);
+
+if (
+  Number.isNaN(amountNumber) ||
+  amountNumber <= 0 ||
+  amountNumber > 1000000
+) {
+  alert("Invalid amount");
+  return;
+}
       await addExpense({
         tripId: trip.id,
         userId: auth.currentUser!.uid,
@@ -973,6 +1037,16 @@ setConfirmationMessage(
   const handleBookTransfer = async (
   transfer: (typeof transfers)[number]
 ) => {
+  const alreadyBooked = expenses.some(
+  e =>
+    e.expenseType === "transfer" &&
+    e.label === `${transfer.from} → ${transfer.to}`
+);
+
+if (alreadyBooked) {
+  alert("Transfer already added.");
+  return;
+}
   if (!trip || !auth.currentUser) return;
 
   try {
@@ -2027,7 +2101,7 @@ await handleBookActivity(activity);
       }}
     >
       <img
-        src={selectedHotel.photos[0]}
+        src={safeImage(selectedHotel.photos[0])}
         alt={selectedHotel.name}
         style={{
           width: "100%",
@@ -2146,7 +2220,7 @@ await handleBookActivity(activity);
       }}
     >
       <img
-        src={selectedTransport.image}
+        src={safeImage(selectedTransport.image)}
         alt={selectedTransport.title}
         style={{
           width: "100%",
@@ -2339,7 +2413,7 @@ await handleBookActivity(activity);
       }}
     >
       <img
-  src={activityImage}
+  src={safeImage(activityImage)}
   alt={activityName}
   style={{
     width: "100%",

@@ -214,6 +214,7 @@ function TripDashboardRoute({ ready, user }: { ready: boolean; user: FirebaseUse
   if (!tripId) {
     return <Navigate to="/trips" replace />;
   }
+  
 
   return (
     <AppViewport>

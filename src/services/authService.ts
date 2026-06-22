@@ -8,6 +8,8 @@ import {
 import { createUserDocument } from "./userService";
 import { auth } from "../firebase/config";
 import { sendEmailVerification } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
 
@@ -86,6 +88,7 @@ export async function loginWithGoogle() {
   }
 }
 export async function registerWithEmail(
+  name: string,
   email: string,
   password: string
 ) {
@@ -108,13 +111,23 @@ if (!strongPassword.test(password)) {
     email,
     password
   );
+  await updateProfile(result.user, {
+  displayName: name,
+});
 
   await createUserDocument(result.user);
   await sendEmailVerification(result.user);
   await signOut(auth);
   return result.user;
 }
-
+export async function resetPassword(
+  email: string
+) {
+  await sendPasswordResetEmail(
+    auth,
+    email
+  );
+}
 export async function loginWithEmail(
   email: string,
   password: string

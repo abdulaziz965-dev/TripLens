@@ -3,8 +3,10 @@ import { BrowserRouter, Navigate, Route, Routes, useNavigate, useParams } from "
 import { onAuthStateChanged, signOut, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "../firebase/config";
 import {
+  loginWithEmail,
   loginWithGoogle,
-  registerWithEmail
+  registerWithEmail,
+  resetPassword
 } from "../services/authService";
 
 // Infrastructure
@@ -24,7 +26,7 @@ import { ExpensesScreen } from "./pages/ExpensesScreen";
 import { ProfileScreen } from "./pages/ProfileScreen";
 import { AppLoadingScreen } from "./pages/AppLoadingScreen";
 import { PaymentMethodsScreen } from "./pages/PaymentMethodsScreen";
-import { EmailAuthScreen } from "./pages/EmailAuthScreen";
+
 import { SettingsScreen } from "./pages/SettingsScreen";
 import { TravelerVerificationScreen } from "./pages/TravelerVerificationScreen";
 import { EditProfileScreen } from "./pages/EditProfileScreen";
@@ -78,7 +80,51 @@ function LoginRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+const handleEmailLogin = async (
+  email: string,
+  password: string
+) => {
+  try {
+    setError(null);
+    setLoading(true);
 
+    await loginWithEmail(email, password);
+
+    navigate("/home", {
+      replace: true,
+    });
+  } catch (error: any) {
+  console.error(error);
+
+  switch (error.code) {
+    case "auth/invalid-credential":
+      setError("Incorrect email or password.");
+      break;
+
+    case "auth/user-not-found":
+      setError("No account found with this email.");
+      break;
+
+    case "auth/wrong-password":
+      setError("Incorrect password.");
+      break;
+
+    case "auth/too-many-requests":
+      setError(
+        "Too many attempts. Try again later."
+      );
+      break;
+
+    default:
+      setError(
+        error?.message ??
+        "Unable to sign in."
+      );
+  }
+} finally {
+    setLoading(false);
+  }
+};
   if (ready && user && !loading) {
     return <Navigate to="/home" replace />;
   }
@@ -99,58 +145,135 @@ function LoginRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null
       });
 
       navigate("/home", { replace: true });
-    } catch (loginError) {
-      if (loginError && typeof loginError === "object") {
-        const firebaseError = loginError as {
-          code?: string;
-          message?: string;
-          name?: string;
-          customData?: unknown;
-        };
+    } catch (error: any) {
+  console.error(error);
 
-        console.error("[TravelLens][UI] Login flow failed", {
-          code: firebaseError.code,
-          message: firebaseError.message,
-          name: firebaseError.name,
-          customData: firebaseError.customData,
-          raw: loginError,
-        });
+  switch (error.code) {
+    case "auth/invalid-credential":
+      setError("Incorrect email or password.");
+      break;
 
-        setError(firebaseError.message ?? "Google sign-in failed.");
-      } else {
-        console.error("[TravelLens][UI] Login flow failed", { raw: loginError });
-        setError("Google sign-in failed.");
-      }
-    } finally {
+    case "auth/user-not-found":
+      setError("No account exists with this email.");
+      break;
+
+    case "auth/wrong-password":
+      setError("Incorrect password.");
+      break;
+
+    case "auth/invalid-email":
+      setError("Please enter a valid email address.");
+      break;
+
+    case "auth/too-many-requests":
+      setError(
+        "Too many failed login attempts. Please try again later."
+      );
+      break;
+
+    default:
+      setError(
+        error?.message ??
+        "Unable to sign in."
+      );
+  }
+} finally {
       setLoading(false);
     }
   };
+  const handleForgotPassword = async (
+  email: string
+) => {
+  if (!email) {
+    setError(
+      "Please enter your email address first."
+    );
+    return;
+  }
+
+  try {
+    await resetPassword(email);
+
+    alert(
+      "Password reset email sent."
+    );
+  } catch (error: any) {
+    setError(
+      error?.message ??
+      "Failed to send reset email."
+    );
+  }
+};
 
   const handlePhoneLogin = () => {
-    alert("Phone Authentication Coming Soon");
+    setError(
+  "Phone authentication is coming soon."
+);
   };
 
-  const handleEmailSignup = async (
+const handleEmailSignup = async (
+  name: string,
   email: string,
   password: string
 ) => {
+  
   try {
-    await registerWithEmail(email, password);
-    navigate("/home", { replace: true });
-  } catch (error) {
-    console.error(error);
+    setLoading(true);
+    setError(null);
+    await registerWithEmail(
+      name,
+      email,
+      password
+    );
+
+    alert(
+      "Verification email sent. Please verify your email before signing in."
+    );
+
+  } catch (error: any) {
+  console.error(error);
+
+  switch (error.code) {
+    case "auth/email-already-in-use":
+      setError(
+        "An account with this email already exists."
+      );
+      break;
+
+    case "auth/invalid-email":
+      setError(
+        "Please enter a valid email address."
+      );
+      break;
+
+    case "auth/weak-password":
+      setError(
+        "Password is too weak."
+      );
+      break;
+
+    default:
+      setError(
+        error?.message ??
+        "Failed to create account."
+      );
+  }
+} finally {
+    setLoading(false);
   }
 };
 
   return (
     <AppViewport background={T.navy}>
       <LoginScreen
-        onLogin={handleLogin}
-        onPhoneLogin={handlePhoneLogin}
-        onEmailSignup={handleEmailSignup}
-        loading={loading}
-        error={error}
-      />
+  onLogin={handleLogin}
+  onPhoneLogin={handlePhoneLogin}
+  onEmailSignup={handleEmailSignup}
+  onEmailLogin={handleEmailLogin}
+  onForgotPassword={handleForgotPassword}
+  loading={loading}
+  error={error}
+/>
     </AppViewport>
   );
 }
@@ -305,7 +428,6 @@ export default function App() {
         <Route path="/home" element={<HomeRoute ready={authReady} user={currentUser} />} />
         <Route path="/create-trip" element={<CreateTripRoute ready={authReady} user={currentUser} />} />
         <Route path="/trip/:tripId" element={<TripDashboardRoute ready={authReady} user={currentUser} />} />
-       <Route path="/email-auth" element={<EmailAuthScreen />} />
         <Route path="/trips" element={<TripsRoute ready={authReady} user={currentUser} />} />
         <Route path="/expenses" element={<ExpensesRoute ready={authReady} user={currentUser} />} />
         <Route path="/settings" element={ <AppViewport> <SettingsScreen /> </AppViewport>}/>

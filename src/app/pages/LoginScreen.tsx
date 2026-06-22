@@ -8,16 +8,50 @@ export function LoginScreen({
   onLogin,
   onPhoneLogin,
   onEmailSignup,
+  onEmailLogin,
+  onForgotPassword,
   loading,
   error
 }: {
   onLogin: () => void;
   onPhoneLogin: () => void;
-  onEmailSignup: (email:string, password:string) => void;
+  onEmailSignup: (
+    name: string,
+    email: string,
+    password: string
+  ) => void;
+  onEmailLogin: (
+    email: string,
+    password: string
+  ) => void;
+  onForgotPassword: (
+    email: string
+  ) => void;
   loading?: boolean;
   error?: string | null;
 }) {
-  const [authMode, setAuthMode] = useState<"social" | "email">("social");
+  const [showSignup, setShowSignup] = useState(false);
+
+const [signupName, setSignupName] = useState("");
+const [signupEmail, setSignupEmail] = useState("");
+const [signupPassword, setSignupPassword] = useState("");
+const [confirmPassword, setConfirmPassword] = useState("");
+const inputStyle = {
+  width: "100%",
+  padding: "15px",
+  borderRadius: 18,
+  border: "1px solid rgba(255,255,255,0.15)",
+  background: "rgba(255,255,255,0.08)",
+  color: "white",
+  outline: "none",
+  marginBottom: 12,
+};
+const canCreateAccount =
+  signupName.trim() &&
+  signupEmail.trim() &&
+  signupPassword.trim() &&
+  confirmPassword.trim();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   return (
@@ -67,9 +101,11 @@ export function LoginScreen({
       <div
         style={{
           position: "absolute",
-          bottom: 0,
+          top: 120,
           left: 0,
           right: 0,
+          bottom: 0,
+          overflowY:"auto",
           padding: "28px 22px 40px",
           background: "rgba(15,23,42,0.97)",
           borderTop: "1px solid rgba(255,255,255,0.07)"
@@ -119,146 +155,180 @@ export function LoginScreen({
     marginBottom: 20
   }}
 >
-  {authMode === "social" ? (
-    <>
-      {/* Google */}
-      <button
-        onClick={onLogin}
-        disabled={loading}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 12,
-          width: "100%",
-          padding: "15px 20px",
-          borderRadius: 18,
-          border: "none",
-          cursor: "pointer",
-          background: "white",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-          opacity: loading ? 0.7 : 1,
-          ...heading,
-          fontSize: 15,
-          color: T.navy
-        }}
-      >
-        Continue with Google
-      </button>
+  <>
+  {/* Google Login */}
+  <button
+    onClick={onLogin}
+    disabled={loading}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      width: "100%",
+      padding: "15px 20px",
+      borderRadius: 18,
+      border: "none",
+      cursor: "pointer",
+      background: "white",
+      boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+      opacity: loading ? 0.7 : 1,
+      ...heading,
+      fontSize: 15,
+      color: T.navy
+    }}
+  >
+    Continue with Google
+  </button>
 
-      {/* Phone */}
-      <button
-        onClick={onPhoneLogin}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 12,
-          width: "100%",
-          padding: "15px 20px",
-          borderRadius: 18,
-          cursor: "pointer",
-          background: "rgba(255,255,255,0.08)",
-          border: "1.5px solid rgba(255,255,255,0.16)",
-          color: "white",
-          ...heading,
-          fontSize: 15
-        }}
-      >
-        <Phone size={20} />
-        Continue with Phone
-      </button>
+  <div
+    style={{
+      textAlign: "center",
+      color: "rgba(255,255,255,0.3)",
+      margin: "4px 0"
+    }}
+  >
+    ──────── OR ────────
+  </div>
 
-      {/* Email */}
-      <button
-        onClick={() => setAuthMode("email")}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 12,
-          width: "100%",
-          padding: "15px 20px",
-          borderRadius: 18,
-          cursor: "pointer",
-          background: "rgba(20,184,166,0.12)",
-          border: `1.5px solid ${T.teal}`,
-          color: "white",
-          ...heading,
-          fontSize: 15
-        }}
-      >
-        <Mail size={20} />
-        Continue with Email
-      </button>
-    </>
-  ) : (
-    <>
-      <input
-        type="email"
-        placeholder="Email Address"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "15px",
-          borderRadius: 18,
-          border: "1px solid rgba(255,255,255,0.15)",
-          background: "rgba(255,255,255,0.08)",
-          color: "white",
-          outline: "none"
-        }}
-      />
+  {/* Email */}
+  <input
+    type="email"
+    placeholder="Email Address"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "15px",
+      borderRadius: 18,
+      border: "1px solid rgba(255,255,255,0.15)",
+      background: "rgba(255,255,255,0.08)",
+      color: "white",
+      outline: "none"
+    }}
+  />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "15px",
-          borderRadius: 18,
-          border: "1px solid rgba(255,255,255,0.15)",
-          background: "rgba(255,255,255,0.08)",
-          color: "white",
-          outline: "none"
-        }}
-      />
+  <input
+    type="password"
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "15px",
+      borderRadius: 18,
+      border: "1px solid rgba(255,255,255,0.15)",
+      background: "rgba(255,255,255,0.08)",
+      color: "white",
+      outline: "none"
+    }}
+  />
+<div
+  style={{
+    textAlign: "right",
+    marginTop: 4,
+    marginBottom: 8
+  }}
+>
+  <button
+    onClick={() => {
+  if (!email.trim()) {
+    alert(
+      "Please enter your email first."
+    );
+    return;
+  }
 
-      <button
-        onClick={() => onEmailSignup(email, password)}
-        style={{
-          width: "100%",
-          padding: "15px",
-          borderRadius: 18,
-          border: "none",
-          background: T.teal,
-          color: "white",
-          cursor: "pointer",
-          ...heading
-        }}
-      >
-        Create Account
-      </button>
+  onForgotPassword(email);
+}}
+    style={{
+      background: "transparent",
+      border: "none",
+      color: T.teal,
+      cursor: "pointer",
+      fontSize: 13
+    }}
+  >
+    Forgot Password?
+  </button>
+</div>
+  <button
+  disabled={!email || !password}
+  onClick={() => onEmailLogin(email, password)}
+  style={{
+    width: "100%",
+    padding: "15px",
+    borderRadius: 18,
+    border: "none",
+    background: T.teal,
+    color: "white",
+    cursor: !email || !password ? "not-allowed" : "pointer",
+    opacity: !email || !password ? 0.5 : 1,
+    ...heading
+  }}
+>
+    Sign In
+  </button>
+  
+  <div
+    style={{
+      textAlign: "center",
+      color: "rgba(255,255,255,0.6)",
+      fontSize: 14
+    }}
+  >
+    Don't have an account?
+  </div>
 
-      <button
-        onClick={() => setAuthMode("social")}
-        style={{
-          width: "100%",
-          padding: "15px",
-          borderRadius: 18,
-          border: "1px solid rgba(255,255,255,0.15)",
-          background: "transparent",
-          color: "white",
-          cursor: "pointer",
-          ...heading
-        }}
-      >
-        ← Back
-      </button>
-    </>
-  )}
+  <button
+    onClick={() => setShowSignup(true)}
+    style={{
+      width: "100%",
+      padding: "15px",
+      borderRadius: 18,
+      border: "1px solid rgba(255,255,255,0.15)",
+      background: "transparent",
+      color: "white",
+      cursor: "pointer",
+      ...heading
+    }}
+  >
+    Create Account
+  </button>
+
+  <div
+    style={{
+      textAlign: "center",
+      color: "rgba(255,255,255,0.3)",
+      margin: "4px 0"
+    }}
+  >
+    ──────── OR ────────
+  </div>
+
+  {/* Phone */}
+  <button
+    onClick={onPhoneLogin}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
+      width: "100%",
+      padding: "15px 20px",
+      borderRadius: 18,
+      cursor: "pointer",
+      background: "rgba(255,255,255,0.08)",
+      border: "1.5px solid rgba(255,255,255,0.16)",
+      color: "white",
+      ...heading,
+      fontSize: 15
+    }}
+  >
+    <Phone size={20} />
+    Continue with Phone
+  </button>
+</>
 </div>
 {error ? (
   <p
@@ -331,6 +401,157 @@ export function LoginScreen({
     </div>
   ))}
 </div>
+{showSignup && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.75)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999
+    }}
+  >
+    <div
+      style={{
+        width: "90%",
+        maxWidth: 420,
+        background: "#0F172A",
+        borderRadius: 24,
+        padding: 24,
+        border: "1px solid rgba(255,255,255,0.1)"
+      }}
+    >
+      <h2
+        style={{
+          color: "white",
+          textAlign: "center",
+          marginBottom: 20
+        }}
+      >
+        Create Account
+      </h2>
+
+      <input
+        placeholder="Full Name"
+        value={signupName}
+        onChange={(e) =>
+          setSignupName(e.target.value)
+        }
+        style={inputStyle}
+      />
+
+      <input
+        type="email"
+        placeholder="Email Address"
+        value={signupEmail}
+        onChange={(e) =>
+          setSignupEmail(e.target.value)
+        }
+        style={inputStyle}
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={signupPassword}
+        onChange={(e) =>
+          setSignupPassword(e.target.value)
+        }
+        style={inputStyle}
+      />
+
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={(e) =>
+          setConfirmPassword(e.target.value)
+        }
+        style={inputStyle}
+      />
+
+     <button
+  disabled={!canCreateAccount}
+  onClick={async () => {
+    if (
+      signupPassword !==
+      confirmPassword
+    ) {
+      alert(
+        "Passwords do not match"
+      );
+      return;
+    }
+
+    if (
+      !signupName.trim() ||
+      !signupEmail.trim() ||
+      !signupPassword.trim()
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+    const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailRegex.test(signupEmail)) {
+  alert("Please enter a valid email");
+  return;
+}
+
+    await onEmailSignup(
+      signupName,
+      signupEmail,
+      signupPassword
+    );
+    setSignupName("");
+setSignupEmail("");
+setSignupPassword("");
+setConfirmPassword("");
+
+    setShowSignup(false);
+  }}
+  style={{
+    width: "100%",
+    padding: "15px",
+    borderRadius: 18,
+    border: "none",
+    background: T.teal,
+    color: "white",
+    cursor: !canCreateAccount
+      ? "not-allowed"
+      : "pointer",
+    opacity: !canCreateAccount
+      ? 0.5
+      : 1,
+    marginTop: 12
+  }}
+>
+  Create Account
+</button>
+      <button
+        onClick={() =>
+          setShowSignup(false)
+        }
+        style={{
+          width: "100%",
+          padding: "15px",
+          marginTop: 10,
+          borderRadius: 18,
+          border:
+            "1px solid rgba(255,255,255,0.15)",
+          background: "transparent",
+          color: "white",
+          cursor: "pointer"
+        }}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
 
       </div>
     </div>

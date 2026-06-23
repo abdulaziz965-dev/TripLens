@@ -5,7 +5,7 @@ import { ArrowLeft, CreditCard, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { T, display, body, heading } from "../theme";
 import { SectionCard } from "../components/SharedComponents";
-
+import { toast } from "react-hot-toast";
 export function PaymentMethodsScreen() {
   const navigate = useNavigate();
 
@@ -43,10 +43,10 @@ export function PaymentMethodsScreen() {
         preferredPayment,
       });
 
-      alert("Payment methods saved!");
+      toast.success("Payment methods saved!");
     } catch (err) {
       console.error(err);
-      alert("Failed to save payment methods");
+      toast.error("Failed to save payment methods");
     }
 
     setSaving(false);

@@ -12,7 +12,7 @@ import {
 // Infrastructure
 import { T } from "./theme";
 import { AppViewport } from "./components/SharedComponents";
-
+import toast, { Toaster } from "react-hot-toast";
 
 // Pages
 import { SplashScreen } from "./pages/SplashScreen";
@@ -194,9 +194,7 @@ const handleEmailLogin = async (
   try {
     await resetPassword(email);
 
-    alert(
-      "Password reset email sent."
-    );
+    toast.success("Password reset email sent.");
   } catch (error: any) {
     setError(
       error?.message ??
@@ -226,7 +224,7 @@ const handleEmailSignup = async (
       password
     );
 
-    alert(
+    toast.success(
       "Verification email sent. Please verify your email before signing in."
     );
 
@@ -421,6 +419,12 @@ export default function App() {
 
   return (
     <BrowserRouter>
+  <Toaster
+    position="bottom-center"
+    toastOptions={{
+      duration: 3000,
+    }}
+  />
       <Routes>
         <Route path="/" element={<SplashRoute ready={authReady} user={currentUser} />} />
         <Route path="/landing" element={<LandingRoute ready={authReady} user={currentUser} />} />

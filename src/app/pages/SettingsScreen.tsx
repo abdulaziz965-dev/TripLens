@@ -5,7 +5,7 @@ import { ArrowLeft, Bell, Globe, MapPinned, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { T, display, body, heading } from "../theme";
 import { SectionCard } from "../components/SharedComponents";
-
+import { toast } from "react-hot-toast";
 export function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [currency, setCurrency] = useState("INR");
@@ -45,10 +45,10 @@ export function SettingsScreen() {
         distanceUnit,
       });
 
-      alert("Settings saved successfully!");
+      toast.success("Settings saved successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to save settings");
+      toast.error("Failed to save settings");
     }
 
     setSaving(false);

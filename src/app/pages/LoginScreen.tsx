@@ -1,8 +1,10 @@
 
-import { Phone, Mail, Shield, Eye, Zap } from "lucide-react";
+import { Phone, Shield, Eye, Zap } from "lucide-react";
 import { T, display, body, heading, label, IMG } from "../theme";
 import { LogoMark } from "../components/SharedComponents";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 export function LoginScreen({
   onLogin,
@@ -92,7 +94,17 @@ const canCreateAccount =
           gap: 8
         }}
       >
-        <LogoMark size={32} />
+        <motion.div
+  animate={{
+    rotate: [0, 3, -3, 0]
+  }}
+  transition={{
+    duration: 5,
+    repeat: Infinity
+  }}
+>
+  <LogoMark size={32} />
+</motion.div>
         <span style={{ ...heading, fontSize: 18, color: "white" }}>
           TripLens
         </span>
@@ -233,7 +245,7 @@ const canCreateAccount =
   <button
     onClick={() => {
   if (!email.trim()) {
-    alert(
+    toast.error(
       "Please enter your email first."
     );
     return;
@@ -479,9 +491,7 @@ const canCreateAccount =
       signupPassword !==
       confirmPassword
     ) {
-      alert(
-        "Passwords do not match"
-      );
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -490,14 +500,14 @@ const canCreateAccount =
       !signupEmail.trim() ||
       !signupPassword.trim()
     ) {
-      alert("Please fill all fields");
+      toast.error("Please fill all fields");
       return;
     }
     const emailRegex =
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 if (!emailRegex.test(signupEmail)) {
-  alert("Please enter a valid email");
+  toast.error("Please enter a valid email");
   return;
 }
 
@@ -506,6 +516,7 @@ if (!emailRegex.test(signupEmail)) {
       signupEmail,
       signupPassword
     );
+    toast.success("Account created successfully");
     setSignupName("");
 setSignupEmail("");
 setSignupPassword("");

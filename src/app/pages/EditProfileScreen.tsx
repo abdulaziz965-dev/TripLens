@@ -5,7 +5,7 @@ import { ArrowLeft, User, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { T, display, body, heading } from "../theme";
 import { SectionCard } from "../components/SharedComponents";
-
+import { toast } from "react-hot-toast";
 export function EditProfileScreen() {
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ export function EditProfileScreen() {
     if (!user) return;
 
     if (!displayName.trim()) {
-      alert("Display name cannot be empty");
+      toast.error("Display name cannot be empty");
       return;
     }
 
@@ -55,10 +55,10 @@ export function EditProfileScreen() {
         }
       );
 
-      alert("✅ Profile updated successfully!");
+      toast.success("✅ Profile updated successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to update profile");
+      toast.error("Failed to update profile");
     }
 
     setSaving(false);

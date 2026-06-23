@@ -30,6 +30,7 @@ import {
   type HotelRecommendation,
 } from "../../data/tripIntelligence";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 type DashboardTab =
   | "transport"
@@ -499,12 +500,15 @@ function HotelCard({
   nights,
   onBook,
   booking,
+  hasHotelBooking,
 }: {
   hotel: HotelRecommendation;
   nights: number;
   onBook: () => void;
   booking: boolean;
+  hasHotelBooking: boolean;
 }) {
+  
   const total = hotel.pricePerNight * hotel.roomsRequired * nights;
   return (
     <SectionCard style={{ overflow: "hidden" }}>
@@ -621,24 +625,33 @@ function HotelCard({
             </p>
           ))}
         </div>
-        <button
-          onClick={onBook}
-          disabled={booking}
-          style={{
-            width: "100%",
-            padding: "14px 0",
-            borderRadius: 14,
-            border: "none",
-            cursor: "pointer",
-            background: T.navy,
-            color: "white",
-            ...heading,
-            fontSize: 14,
-            opacity: booking ? 0.7 : 1,
-          }}
-        >
-          {booking ? "Adding…" : "Booked This"}
-        </button>
+       <button
+  onClick={onBook}
+  disabled={booking || hasHotelBooking}
+  style={{
+    width: "100%",
+    padding: "14px 0",
+    borderRadius: 14,
+    border: "none",
+    cursor: booking || hasHotelBooking
+      ? "not-allowed"
+      : "pointer",
+    background: T.navy,
+    color: "white",
+    ...heading,
+    fontSize: 14,
+    opacity:
+      booking || hasHotelBooking
+        ? 0.7
+        : 1,
+  }}
+>
+  {booking
+    ? "Adding..."
+    : hasHotelBooking
+    ? "Hotel Already Booked"
+    : "Book This"}
+</button>
       </div>
     </SectionCard>
   );
@@ -848,6 +861,30 @@ const tripDays = useMemo(() => {
 
   const totalTravelers = trip ? trip.adults + trip.children + trip.seniors : 0;
   const confirmed = expenses.filter(e => e.category === "Confirmed");
+  const hasHotelBooking = expenses.some(
+  e => e.expenseType === "hotel"
+);
+
+const hasTransportBooking = expenses.some(
+  e =>
+    e.expenseType === "flight" ||
+    e.expenseType === "train" ||
+    e.expenseType === "bus"
+);
+const hasActivityBooking = expenses.some(
+  e => e.expenseType === "activity"
+);
+
+const progressPercent =
+(
+  [
+    hasTransportBooking,
+    hasHotelBooking,
+    hasActivityBooking
+  ].filter(Boolean).length / 3
+) * 100;
+
+
   const manual = expenses.filter(e => e.category === "Manual");
   const parseAmount = (amount: string) => {
   const cleaned = amount.replace(/[^\d]/g, "");
@@ -872,16 +909,14 @@ const savedTotalSpend = expenses.reduce(
   };
 
   const handleBookHotel = async (hotel: HotelRecommendation) => {
-    const alreadyBooked = expenses.some(
-  e =>
-    e.expenseType === "hotel" &&
-    e.label.includes(hotel.name)
-);
-
-if (alreadyBooked) {
-  alert("Hotel already booked.");
+    if (hasHotelBooking) {
+  toast.error(
+    "You already have a hotel booked. Delete it from Expenses first."
+  );
   return;
 }
+
+
     
   if (!trip || !auth.currentUser) return;
 
@@ -909,11 +944,12 @@ if (alreadyBooked) {
         "en-IN"
       )}`
     );
+    setSelectedHotel(null);
 
   } catch (err) {
     console.error("[TripLens] Failed to add hotel expense:", err);
 
-    alert(
+    toast.error(
       "Could not save expense. Check Firestore rules and try again."
     );
   } finally {
@@ -924,14 +960,10 @@ if (alreadyBooked) {
  const handleBookTravelOption = async (
   option: (typeof travelOptions)[number]
 ) => {
-  const alreadyBooked = expenses.some(
-  e =>
-    e.expenseType === option.type &&
-    e.label === option.label
-);
-
-if (alreadyBooked) {
-  alert("Transport already booked.");
+  if (hasTransportBooking) {
+  toast.error(
+    "You already have transport booked. Delete it from Expenses first."
+  );
   return;
 }
   if (!trip || !auth.currentUser) return;
@@ -951,11 +983,12 @@ if (alreadyBooked) {
     setConfirmationMessage(
       `✈️ ${option.label} has been successfully booked!\n\nTotal Amount: ${option.amount}`
     );
+    setSelectedTransport(null);
 
   } catch (err) {
     console.error("[TripLens] Failed to add transport expense:", err);
 
-    alert(
+    toast.error(
       "Could not save expense. Check Firestore rules and try again."
     );
   } finally {
@@ -980,7 +1013,20 @@ const handleBookActivity = async (
       category: "Confirmed",
       expenseType: "activity",
     });
+    const alreadyBooked = expenses.some(
+  e =>
+    e.expenseType === "activity" &&
+    e.label === (
+      activity.name ??
+      activity.properties?.name ??
+      "Activity"
+    )
+);
 
+if (alreadyBooked) {
+  toast.error("Activity already added.");
+  return;
+}
     const activityName =
   activity.name ??
   activity.properties?.name ??
@@ -989,6 +1035,7 @@ const handleBookActivity = async (
 setConfirmationMessage(
   `🎉 Activity booked!\n\n${activityName}`
 );
+  setSelectedActivity(null);
   } catch (err) {
     console.error(err);
   }
@@ -1002,7 +1049,7 @@ setConfirmationMessage(
         ? expenseAmount
         : `₹${parseInt(expenseAmount, 10).toLocaleString("en-IN")}`;
         if (expenseTitle.length > 100) {
-  alert("Title too long");
+  toast.error("Title too long");
   return;
 }
 
@@ -1013,7 +1060,7 @@ if (
   amountNumber <= 0 ||
   amountNumber > 1000000
 ) {
-  alert("Invalid amount");
+  toast.error("Invalid amount");
   return;
 }
       await addExpense({
@@ -1029,7 +1076,7 @@ if (
       setShowAddExpense(false);
     } catch (err) {
       console.error("[TripLens] Failed to add manual expense:", err);
-      alert("Could not save expense. Check Firestore rules and try again.");
+      toast.error("Could not save expense. Check Firestore rules and try again.");
     } finally {
       setSavingExpense(false);
     }
@@ -1044,7 +1091,7 @@ if (
 );
 
 if (alreadyBooked) {
-  alert("Transfer already added.");
+  toast.error("This transfer is already added.");
   return;
 }
   if (!trip || !auth.currentUser) return;
@@ -1068,6 +1115,7 @@ if (alreadyBooked) {
     setConfirmationMessage(
   `🚕 Transfer Added Successfully!\n\n${transfer.from} → ${transfer.to}\n\nEstimated Cost: ₹${maxFare}`
 );
+    setSelectedTransport(null);
   } catch (err) {
     console.error(err);
   }
@@ -1085,7 +1133,7 @@ if (alreadyBooked) {
       });
     } catch (err) {
       console.error("[TripLens] Failed to save trip:", err);
-      alert("Could not save trip. Check Firestore rules and try again.");
+      toast.error("Could not save trip. Check Firestore rules and try again.");
     } finally {
       setSavingTrip(false);
     }
@@ -1108,9 +1156,7 @@ if (alreadyBooked) {
       err
     );
 
-    alert(
-      "Could not delete expense."
-    );
+    toast.error("Could not delete expense.");
   } finally {
     setDeletingExpenseId(null);
   }
@@ -1216,13 +1262,71 @@ if (alreadyBooked) {
             margin: "16px 20px 0",
             background: "white",
             borderRadius: 20,
+            
             padding: "16px 18px",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
+            display: "flex",
+flexDirection: "column",
+gap: 16,
             boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
           }}
         >
+         <div
+  style={{
+    padding: 16,
+    borderRadius: 16,
+    background:
+      "linear-gradient(135deg,#0F172A,#1E293B)",
+  }}
+>
+  <h2
+    style={{
+      ...heading,
+      color: "white",
+      fontSize: 20,
+      marginBottom: 4,
+    }}
+  >
+    ✈️ {trip.destination}
+  </h2>
+
+  <p
+    style={{
+      ...body,
+      color: "rgba(255,255,255,0.7)",
+      marginBottom: 12,
+    }}
+  >
+    {trip.name}
+  </p>
+
+  <p
+    style={{
+      fontSize: 11,
+      color: "white",
+      marginBottom: 6,
+    }}
+  >
+    Trip Completion {Math.round(progressPercent)}%
+  </p>
+
+  <div
+    style={{
+      height: 8,
+      background: "rgba(255,255,255,0.15)",
+      borderRadius: 999,
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        width: `${progressPercent}%`,
+        height: "100%",
+        background: T.teal,
+      }}
+    />
+  </div>
+</div>
+          
           {[
             { icon: <MapPin size={14} color={T.teal} />, label: trip.destination },
             { icon: <Calendar size={14} color={T.teal} />, label: getTripDurationLabel(trip) },
@@ -1390,10 +1494,15 @@ if (alreadyBooked) {
               )}
               {filteredTravelOptions.map(option => (
                <SectionCard
-  onClick={() => setSelectedTransport(option)}
+  onClick={() => {
+  if (!hasTransportBooking) {
+    setSelectedTransport(option);
+  }
+}}
   style={{
     padding: 16,
-    cursor: "pointer",
+    cursor: hasTransportBooking ? "not-allowed" : "pointer",
+    opacity: hasTransportBooking ? 0.7 : 1,
   }}
 >
                   <div
@@ -1454,26 +1563,41 @@ if (alreadyBooked) {
                   )}
 
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleBookTravelOption(option);
-                    }}
-                    disabled={bookingId === option.id}
-                    style={{
-                      width: "100%",
-                      padding: "14px 0",
-                      borderRadius: 14,
-                      border: "none",
-                      cursor: "pointer",
-                      background: T.navy,
-                      color: "white",
-                      ...heading,
-                      fontSize: 14,
-                      opacity: bookingId === option.id ? 0.7 : 1,
-                    }}
-                  >
-                    {bookingId === option.id ? "Adding…" : "Book This"}
-                  </button>
+  onClick={(e) => {
+    e.stopPropagation();
+    handleBookTravelOption(option);
+  }}
+  disabled={
+    bookingId === option.id ||
+    hasTransportBooking
+  }
+  style={{
+    width: "100%",
+    padding: "14px 0",
+    borderRadius: 14,
+    border: "none",
+    cursor:
+      bookingId === option.id ||
+      hasTransportBooking
+        ? "not-allowed"
+        : "pointer",
+    background: T.navy,
+    color: "white",
+    ...heading,
+    fontSize: 14,
+    opacity:
+      bookingId === option.id ||
+      hasTransportBooking
+        ? 0.7
+        : 1,
+  }}
+>
+  {bookingId === option.id
+    ? "Adding..."
+    : hasTransportBooking
+    ? "Transport Already Booked"
+    : "Book This"}
+</button>
                 </SectionCard>
               ))}
             </div>
@@ -1490,15 +1614,27 @@ if (alreadyBooked) {
             {hotels.map(h => (
               <div
                 key={h.id}
-                onClick={() => setSelectedHotel(h)}
-                style={{ cursor: "pointer" }}
+                onClick={() => {
+  if (!hasHotelBooking) {
+    setSelectedHotel(h);
+  }
+}}
+                style={{
+  cursor: hasHotelBooking
+    ? "not-allowed"
+    : "pointer",
+  opacity: hasHotelBooking
+    ? 0.7
+    : 1,
+}}
               >
               <HotelCard
-                hotel={h}
-                nights={nights}
-                onBook={() => handleBookHotel(h)}
-                booking={bookingId === h.id}
-              />
+  hotel={h}
+  nights={nights}
+  onBook={() => handleBookHotel(h)}
+  booking={bookingId === h.id}
+  hasHotelBooking={hasHotelBooking}
+/>
             </div>
         ))}
           </div>
@@ -1565,7 +1701,7 @@ if (alreadyBooked) {
   .flat()
   .some(
     item =>
-      item.id === activity.id
+      item.activityId === activity.id
   );
   const isApiActivity =
     !!activity.properties;
@@ -1787,15 +1923,16 @@ await handleBookActivity(activity);
                 <button
   onClick={() => handleBookTransfer(route)}
   style={{
-    width: "100%",
-    marginTop: 12,
-    padding: 12,
-    borderRadius: 12,
-    border: "none",
-    background: T.navy,
-    color: "white",
-    cursor: "pointer",
-  }}
+  width: "100%",
+  marginTop: 12,
+  padding: 12,
+  borderRadius: 12,
+  border: "none",
+  background: T.navy,
+  color: "white",
+  cursor: "pointer",
+  opacity: 1,
+}}
 >
   Add Transfer Expense
 </button>
@@ -2179,6 +2316,7 @@ await handleBookActivity(activity);
         </div>
 
         <button
+          disabled={hasHotelBooking}
           onClick={() => handleBookHotel(selectedHotel)}
           style={{
             width: "100%",
@@ -2191,7 +2329,9 @@ await handleBookActivity(activity);
             cursor: "pointer",
           }}
         >
-          Book This Hotel
+          {hasHotelBooking
+            ? "Hotel Already Booked"
+            : "Book This Hotel"}
         </button>
       </div>
     </div>
@@ -2368,22 +2508,30 @@ await handleBookActivity(activity);
 </div>
 
         <button
-          onClick={() =>
-            handleBookTravelOption(selectedTransport)
-          }
-          style={{
-            width: "100%",
-            marginTop: 24,
-            padding: 14,
-            borderRadius: 14,
-            border: "none",
-            background: T.navy,
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
-          Book This Transport
-        </button>
+  onClick={() =>
+    handleBookTravelOption(selectedTransport)
+  }
+  disabled={hasTransportBooking}
+  style={{
+    width: "100%",
+    marginTop: 24,
+    padding: 14,
+    borderRadius: 14,
+    border: "none",
+    background: T.navy,
+    color: "white",
+    cursor: hasTransportBooking
+      ? "not-allowed"
+      : "pointer",
+    opacity: hasTransportBooking
+      ? 0.7
+      : 1,
+  }}
+>
+  {hasTransportBooking
+    ? "Transport Already Booked"
+    : "Book This Transport"}
+</button>
       </div>
     </div>
   </div>

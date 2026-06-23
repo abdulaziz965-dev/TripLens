@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { T, display, body, heading } from "../theme";
 import { SectionCard, Chip } from "../components/SharedComponents";
 import { sendEmailVerification } from "firebase/auth";
+import { toast } from "react-hot-toast";
 export function TravelerVerificationScreen() {
   const navigate = useNavigate();
   const user = auth.currentUser;
@@ -19,12 +20,10 @@ export function TravelerVerificationScreen() {
 
     await sendEmailVerification(user);
 
-    alert(
-      "Verification email sent! Please check your inbox."
-    );
+    toast.success("Verification email sent! Please check your inbox.");
   } catch (err) {
     console.error(err);
-    alert("Failed to send verification email.");
+    toast.error("Failed to send verification email.");
   }
 
   setSending(false);
@@ -32,15 +31,11 @@ export function TravelerVerificationScreen() {
 const refreshVerification = async () => {
   await user?.reload();
   if (auth.currentUser?.emailVerified) {
-    alert(
-      "🎉 Email verified successfully!"
-    );
+    toast.success("🎉 Email verified successfully!");
 
     window.location.reload();
   } else {
-    alert(
-      "Email is still not verified."
-    );
+    toast.error("Email is still not verified.");
   }
 };
   return (

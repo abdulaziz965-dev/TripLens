@@ -11,7 +11,7 @@ import { sendEmailVerification } from "firebase/auth";
 import { updateProfile } from "firebase/auth";
 import { sendPasswordResetEmail } from "firebase/auth";
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 15;
+const LOCKOUT_MINUTES = 2;
 
 const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });

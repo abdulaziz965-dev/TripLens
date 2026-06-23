@@ -6,7 +6,7 @@ import { T, display, body, label, subhead } from "../theme";
 import { StatusBar, GuestCounter } from "../components/SharedComponents";
 import { createTrip } from "../../services/dataService";
 import { INDIAN_CITIES } from "../../data/indianCities";
-
+import { toast } from "react-hot-toast";
 const TRIP_TYPES = [
   { id: "family",    icon: "👨‍👩‍👧‍👦", label: "Family"    },
   { id: "adventure", icon: "🏔️",      label: "Adventure" },
@@ -66,7 +66,7 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
       onDone(docRef.id);
     } catch (error) {
       console.error("Error creating trip:", error);
-      alert("Failed to create trip. Please try again.");
+      toast.error("Failed to create trip. Please try again.");
     } finally {
       setLoading(false);
     }

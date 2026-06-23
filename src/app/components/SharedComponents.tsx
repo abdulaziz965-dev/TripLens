@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Briefcase, DollarSign, User, Plus, Minus } from "lucide-react";
 import { T, bodyMed, body, subhead, display } from "../theme";
+import { motion } from "framer-motion";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared micro-components
@@ -92,14 +93,38 @@ export function LogoMark({ size = 48, bg = T.teal }: { size?: number; bg?: strin
   );
 }
 
-export function AppViewport({ children, background = T.bg }: { children: React.ReactNode; background?: string }) {
+export function AppViewport({
+  children,
+  background = T.bg
+}: {
+  children: React.ReactNode;
+  background?: string;
+}) {
   return (
-    <div style={{ minHeight: "100dvh", width: "100%", background, overflow: "hidden" }}>
+    <motion.div
+      initial={{
+        opacity: 0,
+        y: 20
+      }}
+      animate={{
+        opacity: 1,
+        y: 0
+      }}
+      transition={{
+        duration: 0.35,
+        ease: "easeOut"
+      }}
+      style={{
+        minHeight: "100dvh",
+        width: "100%",
+        background,
+        overflow: "hidden"
+      }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
-
 const NAV = [
   { id: "home", path: "/home", icon: <Home size={22} />, label: "Home" },
   { id: "trips", path: "/trips", icon: <Briefcase size={22} />, label: "Trips" },
@@ -112,8 +137,15 @@ export function BottomTabBar() {
   const location = useLocation();
 
   return (
-    <div style={{
-      position: "absolute", bottom: 0, left: 0, right: 0,
+    <motion.div
+  initial={{ y: 100 }}
+  animate={{ y: 0 }}
+  transition={{
+    duration: 0.4,
+    ease: "easeOut"
+  }}
+  style={{
+    position: "absolute", bottom: 0, left: 0, right: 0,
       background: "white", borderTop: `1px solid ${T.border}`,
       display: "flex", justifyContent: "space-around", alignItems: "center",
       paddingTop: 10, paddingBottom: 18,
@@ -134,24 +166,34 @@ export function BottomTabBar() {
           </button>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
 
 export function SectionCard({ children, style, onClick }: { children: React.ReactNode; style?: React.CSSProperties; onClick?: () => void }) {
   return (
-    <div
-      onClick={onClick}
-      style={{
-        borderRadius: 20,
-        background: "white",
-        border: `1px solid ${T.border}`,
-        boxShadow: "0 4px 28px rgba(15,23,42,0.08)",
-        ...style,
-      }}>
-      {children}
-    </div>
-  );
+  <motion.div
+    whileHover={{
+      y: -3,
+      scale: 1.01
+    }}
+    whileTap={{
+      scale: 0.98
+    }}
+    onClick={onClick}
+    style={{
+      borderRadius: 20,
+      background: "white",
+      border: `1px solid ${T.border}`,
+      boxShadow:
+        "0 4px 28px rgba(15,23,42,0.08)",
+      transition: "all .2s",
+      ...style,
+    }}
+  >
+    {children}
+  </motion.div>
+);
 }
 
 export function AmountPill({ value, subtle }: { value: string; subtle?: boolean }) {

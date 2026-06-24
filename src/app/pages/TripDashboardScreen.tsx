@@ -1228,6 +1228,8 @@ if (alreadyBooked) {
           paddingBottom: 16,
           borderRadius: "0 0 28px 28px",
           boxShadow: "0 8px 32px rgba(15,23,42,0.18)",
+          transition: "all 0.25s ease",
+          cursor: "pointer",
         }}
       >
         
@@ -1267,6 +1269,8 @@ if (alreadyBooked) {
     borderRadius: 18,
     background:
       "linear-gradient(135deg,#0F172A,#1E293B)",
+     boxShadow:
+  "0 12px 32px rgba(15,23,42,0.18)", 
     color: "white",
   }}
 >
@@ -1609,16 +1613,24 @@ if (alreadyBooked) {
               )}
               {filteredTravelOptions.map(option => (
                <SectionCard
-  onClick={() => {
+  onClick={() => { 
   if (!hasTransportBooking) {
     setSelectedTransport(option);
   }
 }}
-  style={{
-    padding: 16,
-    cursor: hasTransportBooking ? "not-allowed" : "pointer",
-    opacity: hasTransportBooking ? 0.7 : 1,
-  }}
+
+ style={{
+  padding: 16,
+  cursor: hasTransportBooking
+    ? "not-allowed"
+    : "pointer",
+  opacity: hasTransportBooking
+    ? 0.7
+    : 1,
+  transition: "all 0.25s ease",
+  boxShadow:
+    "0 6px 20px rgba(15,23,42,0.08)",
+}}
 >
                   <div
                     style={{
@@ -1741,6 +1753,7 @@ if (alreadyBooked) {
   opacity: hasHotelBooking
     ? 0.7
     : 1,
+    transition: "all 0.25s ease",
 }}
               >
               <HotelCard
@@ -1784,13 +1797,21 @@ if (alreadyBooked) {
         }}
       >
         <p style={heading}>
-          {day}
-        </p>
+  📅 {day} • {(dayPlans[day] || []).length} Activities
+</p>
 
         {(dayPlans[day] || []).length === 0 ? (
-          <p style={body}>
-            No activities planned
-          </p>
+          <p
+  style={{
+    ...body,
+    color: T.slate,
+    marginTop: 6,
+  }}
+>
+  🗓 No activities planned yet.
+  <br />
+  Tap "Add Activity" below.
+</p>
         ) : (
           dayPlans[day].map(activity => (
             <p key={activity.id}>
@@ -1804,8 +1825,19 @@ if (alreadyBooked) {
     setSelectedDay(day);
     setShowActivityPicker(true);
   }}
+  style={{
+    marginTop: 12,
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    border: "none",
+    background: T.navy,
+    color: "white",
+    cursor: "pointer",
+    fontWeight: 600,
+  }}
 >
-  Add Activity
+  ➕ Add Activity
 </button>
       </div>
     ))}
@@ -1827,12 +1859,22 @@ if (alreadyBooked) {
       style={{
         width: "100%",
         height: "80vh",
+        
         background: "white",
         borderRadius: "24px 24px 0 0",
         overflowY: "auto",
         padding: 20,
       }}
     >
+      <div
+  style={{
+    width: 50,
+    height: 5,
+    borderRadius: 999,
+    background: "#CBD5E1",
+    margin: "0 auto 16px",
+  }}
+/>
       <div
         style={{
           display: "flex",

@@ -108,12 +108,12 @@ const [displayName, setDisplayName] = useState("Traveler");
           
           <div style={{ padding: "6px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
-              <p style={{ ...body, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Good Morning ☀️</p>
+              <p style={{ ...body, fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>Welcome Back</p>
               <h1 style={{ ...display, fontSize: 27, color: "white", letterSpacing: -0.6, lineHeight: 1.1 }}>
                 {displayName}
               </h1>
               <p style={{ ...body, fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4 }}>
-                Your next adventure awaits
+                Let's plan something unforgettable
               </p>
             </div>
             {/* Avatar */}
@@ -140,8 +140,10 @@ const [displayName, setDisplayName] = useState("Traveler");
             <div style={{
               display: "flex", alignItems: "center", gap: 12,
               background: "rgba(255,255,255,0.1)", backdropFilter: "blur(10px)",
-              borderRadius: 16, padding: "13px 16px",
+              borderRadius: 16, padding: "15px 18px",
               border: "1.5px solid rgba(255,255,255,0.14)",
+              boxShadow:
+  "0 8px 24px rgba(0,0,0,0.12)",
             }}>
               <Search size={18} style={{ color: "rgba(255,255,255,0.5)", flexShrink: 0 }} />
               <input type="text" placeholder="Where do you want to go?" style={{
@@ -206,12 +208,13 @@ const [displayName, setDisplayName] = useState("Traveler");
           <div style={{ display: "flex", gap: 14, overflowX: "auto", scrollbarWidth: "none", padding: "0 20px" }}>
             {destinations.map(d => (
               <div key={d.id} onClick={() => onCreateTrip(d.name)} style={{
-                flexShrink: 0, width: 186, borderRadius: 20, overflow: "hidden",
-                background: T.navy, cursor: "pointer",
+                flexShrink: 0, width: 200, borderRadius: 20, overflow: "hidden",
+                background:
+  "linear-gradient(135deg,#0F172A,#1E293B)", cursor: "pointer",
                 boxShadow: "0 8px 32px rgba(15,23,42,0.16)",
               }}>
                 {/* Photo */}
-                <div style={{ position: "relative", height: 140 }}>
+                <div style={{ position: "relative", height: 155 }}>
                   <img src={d.img} alt={d.name}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0) 25%, rgba(15,23,42,0.88) 100%)" }} />
@@ -233,7 +236,7 @@ const [displayName, setDisplayName] = useState("Traveler");
                   </div>
                   {/* Destination info */}
                   <div style={{ position: "absolute", bottom: 8, left: 10, right: 10 }}>
-                    <p style={{ ...display, fontSize: 17, color: "white", letterSpacing: -0.3 }}>{d.name}</p>
+                    <p style={{ ...display, fontSize: 17,fontWeight: 700, color: "white", letterSpacing: -0.3 }}>{d.name}</p>
                     <p style={{ ...body, fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{d.sub} · {d.temp}</p>
                   </div>
                 </div>
@@ -266,7 +269,7 @@ const [displayName, setDisplayName] = useState("Traveler");
               cursor: "pointer",
             }}>
               {/* Trip hero image */}
-              <div style={{ position: "relative", height: 116 }}>
+              <div style={{ position: "relative", height: 140 }}>
                 <img src={IMG.goa} alt={activeTrip.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 <div style={{ position: "absolute", inset: 0, background: "rgba(15,23,42,0.62)" }} />
                 <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
@@ -278,7 +281,7 @@ const [displayName, setDisplayName] = useState("Traveler");
                         borderRadius: 99, padding: "2px 8px",
                       }}>{activeTrip.status}</span>
                     </div>
-                    <p style={{ ...display, fontSize: 18, color: "white", letterSpacing: -0.3 }}>{activeTrip.name}</p>
+                    <p style={{ ...display, fontSize: 22, color: "white", letterSpacing: -0.3 }}>{activeTrip.name}</p>
                     <p style={{ ...body, fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>
                       {activeTrip.startDate} · {activeTrip.adults + activeTrip.children + activeTrip.seniors} Travelers
                     </p>
@@ -324,7 +327,10 @@ const [displayName, setDisplayName] = useState("Traveler");
         {activeTrip && (
           <div style={{ padding: "18px 20px 0" }}>
             <div style={{
-              background: T.navy, borderRadius: 20, padding: "16px",
+              background:
+  "linear-gradient(135deg,#0F172A,#1E293B)", borderRadius: 20, padding: "16px",
+  boxShadow:
+  "0 12px 32px rgba(15,23,42,0.18)",
               display: "flex", alignItems: "center", gap: 14,
             }}>
               <div style={{
@@ -353,7 +359,8 @@ const [displayName, setDisplayName] = useState("Traveler");
           <button onClick={() => onCreateTrip()} style={{
             width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             borderRadius: 18, padding: "15px 0", border: `1.5px solid ${T.teal}`,
-            background: "rgba(20,184,166,0.07)", cursor: "pointer",
+            background:
+  "linear-gradient(135deg, rgba(20,184,166,0.12), rgba(14,165,233,0.08))", cursor: "pointer",
             ...heading, fontSize: 15, color: T.teal,
           }}>
             <Plus size={18} /> Plan a New Trip

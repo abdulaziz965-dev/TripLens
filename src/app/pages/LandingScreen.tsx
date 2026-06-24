@@ -5,19 +5,19 @@ import { LogoMark } from "../components/SharedComponents";
 export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSignIn: () => void }) {
   const FEATURES = [
     {
-      icon: <Bed size={20} />,
+      icon: <Bed size={24} />,
       color: T.teal, bg: "#F0FDFA",
       title: "Reality Checked Stays",
       desc: "Know if your family actually fits comfortably — beds, bathrooms, and real room sizes.",
     },
     {
-      icon: <Car size={20} />,
+      icon: <Car size={24} />,
       color: "#6366F1", bg: "#EEF2FF",
       title: "Door-To-Door Costs",
       desc: "Understand every rupee from airport transfers, bus stands, hotels to attractions.",
     },
     {
-      icon: <CreditCard size={20} />,
+      icon: <CreditCard size={24} />,
       color: "#10B981", bg: "#F0FDF4",
       title: "No Hidden Costs",
       desc: "See resort fees, service charges, and extra levies before you commit your money.",
@@ -25,10 +25,10 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
   ];
 
   const STATS = [
-    { val: "50K+", label: "Trips planned" },
-    { val: "4.9★", label: "App Store" },
-    { val: "₹0", label: "Hidden surprises" },
-  ];
+  { val: "Hotels", label: "Reality Checked" },
+  { val: "Transport", label: "Door-To-Door" },
+  { val: "Activities", label: "Budget Planned" },
+];
 
   return (
     <div style={{ width: "100%", minHeight: "100dvh", overflowY: "auto", scrollbarWidth: "none", background: T.bg }}>
@@ -44,7 +44,7 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
         <div style={{ position: "absolute", top: 70, left: 20, right: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <LogoMark size={34} />
-            <span style={{ ...heading, fontSize: 20, color: "white" }}>TripLens</span>
+            <span style={{ ...heading, fontSize: 24, color: "white" }}>TripLens</span>
           </div>
           <button onClick={onSignIn} style={{
             ...bodyMed, fontSize: 13, color: "white",
@@ -52,6 +52,40 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
             border: "1px solid rgba(255,255,255,0.22)", borderRadius: 99, padding: "7px 18px",
           }}>Sign In</button>
         </div>
+<div
+  style={{
+    position: "absolute",
+    top: 140,
+    left: 20,
+    right: 20,
+    background: "rgba(255,255,255,0.12)",
+    backdropFilter: "blur(12px)",
+    border: "1px solid rgba(255,255,255,0.18)",
+    borderRadius: 20,
+    padding: 16,
+  }}
+>
+  <p
+    style={{
+      color: "white",
+      fontSize: 15,
+      fontWeight: 700,
+      marginBottom: 6,
+    }}
+  >
+    Reality-First Travel Planning
+  </p>
+
+  <p
+    style={{
+      color: "rgba(255,255,255,0.75)",
+      fontSize: 12,
+      lineHeight: 1.5,
+    }}
+  >
+    Real hotel capacity • Real transport costs • No hidden fees
+  </p>
+</div>
 
         {/* Hero copy */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "0 22px 24px" }}>
@@ -78,12 +112,14 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
           <button onClick={onStart} style={{
             width: "100%", padding: "16px 0", borderRadius: 18, display: "flex",
             alignItems: "center", justifyContent: "center", gap: 8,
-            background: T.teal, color: "white", border: "none", cursor: "pointer",
+            background:
+  "linear-gradient(135deg,#14B8A6,#0EA5E9)", color: "white", border: "none", cursor: "pointer",
             ...heading, fontSize: 16,
-            boxShadow: `0 14px 48px rgba(20,184,166,0.48)`,
+           boxShadow:
+  "0 12px 40px rgba(20,184,166,0.35)",
             marginBottom: 11,
           }}>
-            Start Planning <ArrowRight size={18} />
+            Plan My Trip <ArrowRight size={18} />
           </button>
         </div>
       </div>
@@ -91,11 +127,13 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
       {/* ── Stats band ───────────────────────────────────────────── */}
       <div style={{
         display: "flex", justifyContent: "space-around", alignItems: "center",
-        padding: "18px 24px", background: T.navy,
+        padding: "22px 24px",
+background:
+  "linear-gradient(135deg,#0F172A,#1E293B)",
       }}>
         {STATS.map((s, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <span style={{ ...display, fontSize: 20, color: "white" }}>{s.val}</span>
+            <span style={{ ...display, fontSize: 24, color: "white" }}>{s.val}</span>
             <span style={{ ...body, fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>{s.label}</span>
           </div>
         ))}
@@ -103,21 +141,39 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
 
       {/* ── Feature cards ────────────────────────────────────────── */}
       <div style={{ padding: "24px 20px 32px" }}>
-        <p style={{ ...heading, fontSize: 20, color: T.navy, marginBottom: 4 }}>What TripLens reveals</p>
+        <p style={{ ...heading, fontSize: 24, color: T.navy, marginBottom: 4 }}>What TripLens reveals</p>
         <p style={{ ...body, fontSize: 13, color: T.slateL, marginBottom: 18, lineHeight: 1.6 }}>
           The truth traditional apps hide from you.
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {FEATURES.map((f, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "flex-start", gap: 14,
-              background: "white", borderRadius: 20, padding: "16px 16px",
-              boxShadow: "0 2px 20px rgba(15,23,42,0.06)",
-              border: `1px solid ${T.border}`,
-            }}>
+            <div
+  key={i}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(-3px)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(0)";
+  }}
+  style={{
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 14,
+    background: "white",
+    borderRadius: 20,
+    padding: "16px 16px",
+    boxShadow:
+      "0 8px 24px rgba(15,23,42,0.08)",
+    border: `1px solid ${T.border}`,
+    transition: "all 0.25s ease",
+    cursor: "pointer",
+  }}
+>
               <div style={{
-                width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+                width: 52, height: 52, borderRadius: 14, flexShrink: 0,
                 background: f.bg, color: f.color,
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>{f.icon}</div>
@@ -129,6 +185,40 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
             </div>
           ))}
         </div>
+        <div
+  style={{
+    marginTop: 18,
+    background: "white",
+    borderRadius: 18,
+    padding: 18,
+    border: `1px solid ${T.border}`,
+  }}
+>
+  <p
+    style={{
+      ...heading,
+      fontSize: 16,
+      marginBottom: 10,
+    }}
+  >
+    Why TripLens?
+  </p>
+
+  <p
+    style={{
+      ...body,
+      color: T.slate,
+      lineHeight: 1.6,
+    }}
+  >
+    Most travel apps show prices.
+    TripLens shows reality.
+    Know actual room capacity,
+    transport costs, hidden fees,
+    and realistic budgets before
+    spending your money.
+  </p>
+</div>
 
         {/* Trust bar */}
         <div style={{
@@ -137,7 +227,7 @@ export function LandingScreen({ onStart, onSignIn }: { onStart: () => void; onSi
           border: "1px solid rgba(20,184,166,0.15)",
         }}>
           <p style={{ ...bodyMed, fontSize: 13, color: T.teal }}>
-            🌟 Join 50,000+ smart travelers who plan with reality, not illusions.
+            🌟 Join smart travelers who plan with reality, not illusions.
           </p>
         </div>
       </div>

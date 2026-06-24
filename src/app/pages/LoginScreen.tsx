@@ -105,9 +105,27 @@ const canCreateAccount =
 >
   <LogoMark size={32} />
 </motion.div>
-        <span style={{ ...heading, fontSize: 18, color: "white" }}>
-          TripLens
-        </span>
+        <div>
+  <span
+    style={{
+      ...heading,
+      fontSize: 20,
+      color: "white",
+      display: "block"
+    }}
+  >
+    TripLens
+  </span>
+
+  <span
+    style={{
+      fontSize: 11,
+      color: "rgba(255,255,255,0.45)"
+    }}
+  >
+    Travel Reality Planner
+  </span>
+</div>
       </div>
 
       <div
@@ -119,7 +137,9 @@ const canCreateAccount =
           bottom: 0,
           overflowY:"auto",
           padding: "28px 22px 40px",
-          background: "rgba(15,23,42,0.97)",
+          background:
+  "linear-gradient(180deg, rgba(15,23,42,0.94), rgba(15,23,42,0.99))",
+backdropFilter: "blur(20px)",
           borderTop: "1px solid rgba(255,255,255,0.07)"
         }}
       >
@@ -138,13 +158,13 @@ const canCreateAccount =
           <h2
             style={{
               ...display,
-              fontSize: 28,
+              fontSize: 32,
               color: "white",
               letterSpacing: -0.5,
               marginBottom: 8
             }}
           >
-            Welcome Back
+            Welcome Back 
           </h2>
 
           <p
@@ -178,6 +198,7 @@ const canCreateAccount =
       justifyContent: "center",
       gap: 12,
       width: "100%",
+      transition: "all 0.25s ease",
       padding: "15px 20px",
       borderRadius: 18,
       border: "none",
@@ -190,7 +211,7 @@ const canCreateAccount =
       color: T.navy
     }}
   >
-    Continue with Google
+    🔵 Continue with Google
   </button>
 
   <div
@@ -200,7 +221,42 @@ const canCreateAccount =
       margin: "4px 0"
     }}
   >
-    ──────── OR ────────
+    <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    margin: "4px 0",
+  }}
+>
+  <div
+    style={{
+      flex: 1,
+      height: 1,
+      background:
+        "rgba(255,255,255,0.08)",
+    }}
+  />
+
+  <span
+    style={{
+      fontSize: 11,
+      color:
+        "rgba(255,255,255,0.3)",
+    }}
+  >
+    OR
+  </span>
+
+  <div
+    style={{
+      flex: 1,
+      height: 1,
+      background:
+        "rgba(255,255,255,0.08)",
+    }}
+  />
+</div>
   </div>
 
   {/* Email */}
@@ -214,7 +270,8 @@ const canCreateAccount =
       padding: "15px",
       borderRadius: 18,
       border: "1px solid rgba(255,255,255,0.15)",
-      background: "rgba(255,255,255,0.08)",
+      background: "rgba(255,255,255,0.06)",
+backdropFilter: "blur(8px)",
       color: "white",
       outline: "none"
     }}
@@ -230,7 +287,8 @@ const canCreateAccount =
       padding: "15px",
       borderRadius: 18,
       border: "1px solid rgba(255,255,255,0.15)",
-      background: "rgba(255,255,255,0.08)",
+      background: "rgba(255,255,255,0.06)",
+backdropFilter: "blur(8px)",
       color: "white",
       outline: "none"
     }}
@@ -315,7 +373,42 @@ const canCreateAccount =
       margin: "4px 0"
     }}
   >
-    ──────── OR ────────
+    <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    margin: "4px 0",
+  }}
+>
+  <div
+    style={{
+      flex: 1,
+      height: 1,
+      background:
+        "rgba(255,255,255,0.08)",
+    }}
+  />
+
+  <span
+    style={{
+      fontSize: 11,
+      color:
+        "rgba(255,255,255,0.3)",
+    }}
+  >
+    OR
+  </span>
+
+  <div
+    style={{
+      flex: 1,
+      height: 1,
+      background:
+        "rgba(255,255,255,0.08)",
+    }}
+  />
+</div>
   </div>
 
   {/* Phone */}
@@ -429,7 +522,8 @@ const canCreateAccount =
       style={{
         width: "90%",
         maxWidth: 420,
-        background: "#0F172A",
+        background:
+  "linear-gradient(180deg,#0F172A,#162235)",
         borderRadius: 24,
         padding: 24,
         border: "1px solid rgba(255,255,255,0.1)"

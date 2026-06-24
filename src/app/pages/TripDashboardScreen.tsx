@@ -4,7 +4,7 @@ import React, {
   useEffect
 } from "react";
 import {
-  ChevronLeft, MapPin, Calendar, Users, Hotel, Car, Wallet,
+  ChevronLeft, MapPin, Hotel, Car, Wallet,
   Star, CheckCircle, AlertTriangle, Plus, X, Trash2, Plane,
 } from "lucide-react";
 import {
@@ -897,7 +897,6 @@ const savedTotalSpend = expenses.reduce(
   0
 );
   const savedTotalSpendLabel = `₹${savedTotalSpend.toLocaleString("en-IN")}`;
-  const displayedTripCost = expenses.length > 0 ? savedTotalSpendLabel : trip?.cost || savedTotalSpendLabel;
 
   const formatExpenseDate = (createdAt?: { toDate?: () => Date }) => {
     const date = createdAt?.toDate?.();
@@ -998,6 +997,16 @@ const savedTotalSpend = expenses.reduce(
 const handleBookActivity = async (
   activity: (typeof activities)[number]
 ) => {
+  const alreadyBooked = expenses.some(
+  e =>
+    e.expenseType === "activity" &&
+    e.label === (
+      activity.name ??
+      activity.properties?.name ??
+      "Activity"
+    )
+);
+
   if (!trip || !auth.currentUser) return;
   try {
     await addExpense({
@@ -1013,16 +1022,7 @@ const handleBookActivity = async (
       category: "Confirmed",
       expenseType: "activity",
     });
-    const alreadyBooked = expenses.some(
-  e =>
-    e.expenseType === "activity" &&
-    e.label === (
-      activity.name ??
-      activity.properties?.name ??
-      "Activity"
-    )
-);
-
+    
 if (alreadyBooked) {
   toast.error("Activity already added.");
   return;
@@ -1220,6 +1220,7 @@ if (alreadyBooked) {
         background: T.bg,
       }}
     >
+      
       {/* Header */}
       <div
         style={{
@@ -1257,89 +1258,203 @@ if (alreadyBooked) {
             {trip.status}
           </Chip>
         </div>
+      </div>
+        
+       <div style={{ padding: "0 20px", marginTop: 12 }}> 
         <div
-          style={{
-            margin: "16px 20px 0",
-            background: "white",
-            borderRadius: 20,
-            
-            padding: "16px 18px",
-            display: "flex",
-flexDirection: "column",
-gap: 16,
-            boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-          }}
-        >
-         <div
   style={{
-    padding: 16,
-    borderRadius: 16,
+    padding: 18,
+    borderRadius: 18,
     background:
       "linear-gradient(135deg,#0F172A,#1E293B)",
+    color: "white",
   }}
 >
-  <h2
-    style={{
-      ...heading,
-      color: "white",
-      fontSize: 20,
-      marginBottom: 4,
-    }}
-  >
-    ✈️ {trip.destination}
-  </h2>
-
-  <p
-    style={{
-      ...body,
-      color: "rgba(255,255,255,0.7)",
-      marginBottom: 12,
-    }}
-  >
-    {trip.name}
-  </p>
-
-  <p
-    style={{
-      fontSize: 11,
-      color: "white",
-      marginBottom: 6,
-    }}
-  >
-    Trip Completion {Math.round(progressPercent)}%
-  </p>
-
+  {/* Top Row */}
   <div
     style={{
-      height: 8,
-      background: "rgba(255,255,255,0.15)",
-      borderRadius: 999,
-      overflow: "hidden",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: 14,
     }}
   >
+    <div>
+      <h2
+        style={{
+          ...heading,
+          color: "white",
+          fontSize: 22,
+          marginBottom: 4,
+        }}
+      >
+        ✈️ {trip.destination}
+      </h2>
+
+      <p
+        style={{
+          ...body,
+          color: "rgba(255,255,255,0.7)",
+        }}
+      >
+        {trip.name}
+      </p>
+    </div>
+
+    <Chip
+      color={T.teal}
+      bg="rgba(20,184,166,0.15)"
+      border="rgba(20,184,166,0.3)"
+    >
+      {trip.status}
+    </Chip>
+  </div>
+
+  {/* Progress */}
+  <div style={{ marginBottom: 18 }}>
     <div
       style={{
-        width: `${progressPercent}%`,
-        height: "100%",
-        background: T.teal,
+        display: "flex",
+        justifyContent: "space-between",
+        marginBottom: 6,
       }}
-    />
+    >
+      <span
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.6)",
+        }}
+      >
+        Trip Completion
+      </span>
+
+      <span
+        style={{
+          fontSize: 11,
+          color: T.teal,
+          fontWeight: 600,
+        }}
+      >
+        {Math.round(progressPercent)}%
+      </span>
+    </div>
+
+    <div
+      style={{
+        height: 8,
+        background:
+          "rgba(255,255,255,0.12)",
+        borderRadius: 999,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          width: `${progressPercent}%`,
+          height: "100%",
+          background: T.teal,
+          borderRadius: 999,
+          transition: "0.4s",
+        }}
+      />
+    </div>
+  </div>
+
+  {/* Stats Grid */}
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 14,
+    }}
+  >
+    <div>
+      <p
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.5)",
+        }}
+      >
+        Duration
+      </p>
+
+      <p
+        style={{
+          ...heading,
+          color: "white",
+          fontSize: 15,
+        }}
+      >
+        {getTripDurationLabel(trip)}
+      </p>
+    </div>
+
+    <div>
+      <p
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.5)",
+        }}
+      >
+        Travelers
+      </p>
+
+      <p
+        style={{
+          ...heading,
+          color: "white",
+          fontSize: 15,
+        }}
+      >
+        {totalTravelers}
+      </p>
+    </div>
+
+    <div>
+      <p
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.5)",
+        }}
+      >
+        Budget Used
+      </p>
+
+      <p
+        style={{
+          ...heading,
+          color: "white",
+          fontSize: 15,
+        }}
+      >
+        {savedTotalSpendLabel}
+      </p>
+    </div>
+
+    <div>
+      <p
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.5)",
+        }}
+      >
+        Status
+      </p>
+
+      <p
+        style={{
+          ...heading,
+          color: T.teal,
+          fontSize: 15,
+        }}
+      >
+        {trip.status}
+      </p>
+    </div>
   </div>
 </div>
-          
-          {[
-            { icon: <MapPin size={14} color={T.teal} />, label: trip.destination },
-            { icon: <Calendar size={14} color={T.teal} />, label: getTripDurationLabel(trip) },
-            { icon: <Users size={14} color={T.teal} />, label: `${totalTravelers} travelers` },
-            { icon: <Wallet size={14} color={T.teal} />, label: displayedTripCost },
-          ].map(item => (
-            <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {item.icon}
-              <span style={{ ...body, fontSize: 13, color: T.navy }}>{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+</div>
+
 
       {/* Tabs */}
       <div
@@ -1695,167 +1810,243 @@ gap: 16,
       </div>
     ))}
   </SectionCard>
-   {showActivityPicker &&
-  activities.map((activity, index) => {
-    const alreadyAdded = Object.values(dayPlans)
-  .flat()
-  .some(
-    item =>
-      item.activityId === activity.id
-  );
-  const isApiActivity =
-    !!activity.properties;
-
-  const name = toTitleCase(
-  activity.name ??
-  activity.properties?.name ??
-  "Tourist Attraction"
-);
-
-  const description =
-    activity.description ??
-    activity.properties?.formatted ??
-    "Popular attraction in this destination.";
-
-  const category = toTitleCase(
-  (
-    activity.properties?.categories?.[0] ??
-    "Attraction"
-  )
-    .replace(".", " ")
-    .replace("_", " ")
-);
-  const rating =
-    activity.rating ?? "4.5";
-
-  const image =
-    activity.image ??
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
-
-  return (
-    <SectionCard
-      key={activity.id ?? index}
-      onClick={() => setSelectedActivity(activity)}
+   {showActivityPicker && (
+  <div
+    onClick={() => setShowActivityPicker(false)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.6)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "flex-end",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
       style={{
-        padding: 16,
-        cursor: "pointer",
+        width: "100%",
+        height: "80vh",
+        background: "white",
+        borderRadius: "24px 24px 0 0",
+        overflowY: "auto",
+        padding: 20,
       }}
     >
-      <img
-        src={image}
-        alt={name}
+      <div
         style={{
-          width: "100%",
-          height: 180,
-          objectFit: "cover",
-          borderRadius: 12,
-          marginBottom: 12,
-        }}
-      />
-
-      <p
-        style={{
-          ...heading,
-          fontSize: 16,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20,
         }}
       >
-        {name}
-      </p>
+        <h2 style={heading}>
+          Activities for {selectedDay}
+        </h2>
 
-      <p
+        <button
+          onClick={() =>
+            setShowActivityPicker(false)
+          }
+          style={{
+            border: "none",
+            background: "transparent",
+            cursor: "pointer",
+            fontSize: 24,
+          }}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div
         style={{
-          ...body,
-          color: "#f59e0b",
-          marginTop: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
         }}
       >
-        ⭐ {rating}
-      </p>
+        {activities.map((activity, index) => {
+          const alreadyAdded = Object.values(dayPlans)
+            .flat()
+            .some(
+              item =>
+                item.activityId === activity.id
+            );
 
-      <p
-        style={{
-          ...body,
-          marginTop: 8,
-        }}
-      >
-        {description}
-      </p>
+          const isApiActivity =
+            !!activity.properties;
 
-      <p
-        style={{
-          ...body,
-          marginTop: 8,
-          color: T.teal,
-        }}
-      >
-        {category}
-      </p>
+          const name = toTitleCase(
+            activity.name ??
+              activity.properties?.name ??
+              "Tourist Attraction"
+          );
 
-      {!isApiActivity && (
-        <>
-          <p
-            style={{
-              ...body,
-              marginTop: 8,
-            }}
-          >
-            {activity.duration}
-          </p>
+          const description =
+            activity.description ??
+            activity.properties?.formatted ??
+            "Popular attraction in this destination.";
 
-          <AmountPill
-            value={activity.price}
-          />
-        </>
-      )}
+          const category = toTitleCase(
+            (
+              activity.properties?.categories?.[0] ??
+              "Attraction"
+            )
+              .replace(".", " ")
+              .replace("_", " ")
+          );
 
-      <button
-  disabled={alreadyAdded}
-  onClick={async (e) => {
-    e.stopPropagation();
+          const rating =
+            activity.rating ?? "4.5";
 
-    if (!selectedDay || alreadyAdded) return;
+          const image =
+            activity.image ??
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
 
-  await addPlannedActivity({
-  tripId: trip.id,
-  userId: auth.currentUser!.uid,
-  day: selectedDay,
-  activityId: activity.id,
-  name:
-    activity.name ??
-    activity.properties?.name ??
-    "Activity",
-  price:
-    activity.price ??
-    "₹0",
-});
+          return (
+            <SectionCard
+              key={activity.id ?? index}
+              onClick={() =>
+                setSelectedActivity(activity)
+              }
+              style={{
+                padding: 16,
+                cursor: "pointer",
+              }}
+            >
+              <img
+                src={image}
+                alt={name}
+                style={{
+                  width: "100%",
+                  height: 180,
+                  objectFit: "cover",
+                  borderRadius: 12,
+                  marginBottom: 12,
+                }}
+              />
 
-await handleBookActivity(activity);
+              <p
+                style={{
+                  ...heading,
+                  fontSize: 16,
+                }}
+              >
+                {name}
+              </p>
 
-    setShowActivityPicker(false);
-  }}
-  style={{
-    width: "100%",
-    marginTop: 12,
-    padding: 12,
-    borderRadius: 12,
-    border: "none",
-    background: alreadyAdded
-      ? "#94a3b8"
-      : T.teal,
-    color: "white",
-    cursor: alreadyAdded
-      ? "not-allowed"
-      : "pointer",
-  }}
->
-  {alreadyAdded
-    ? "Already Planned"
-    : "Add Activity"}
-</button>
-    </SectionCard>
-  );
-})}
+              <p
+                style={{
+                  ...body,
+                  color: "#f59e0b",
+                  marginTop: 4,
+                }}
+              >
+                ⭐ {rating}
+              </p>
+
+              <p
+                style={{
+                  ...body,
+                  marginTop: 8,
+                }}
+              >
+                {description}
+              </p>
+
+              <p
+                style={{
+                  ...body,
+                  marginTop: 8,
+                  color: T.teal,
+                }}
+              >
+                {category}
+              </p>
+
+              {!isApiActivity && (
+                <>
+                  <p
+                    style={{
+                      ...body,
+                      marginTop: 8,
+                    }}
+                  >
+                    {activity.duration}
+                  </p>
+
+                  <AmountPill
+                    value={activity.price}
+                  />
+                </>
+              )}
+
+              <button
+                disabled={alreadyAdded}
+                onClick={async (e) => {
+                  e.stopPropagation();
+
+                  if (
+                    !selectedDay ||
+                    alreadyAdded
+                  )
+                    return;
+
+                  await addPlannedActivity({
+                    tripId: trip.id,
+                    userId:
+                      auth.currentUser!.uid,
+                    day: selectedDay,
+                    activityId:
+                      activity.id,
+                    name:
+                      activity.name ??
+                      activity.properties?.name ??
+                      "Activity",
+                    price:
+                      activity.price ??
+                      "₹0",
+                  });
+
+                  await handleBookActivity(
+                    activity
+                  );
+
+                  setShowActivityPicker(
+                    false
+                  );
+                }}
+                style={{
+                  width: "100%",
+                  marginTop: 12,
+                  padding: 12,
+                  borderRadius: 12,
+                  border: "none",
+                  background:
+                    alreadyAdded
+                      ? "#94a3b8"
+                      : T.teal,
+                  color: "white",
+                  cursor:
+                    alreadyAdded
+                      ? "not-allowed"
+                      : "pointer",
+                }}
+              >
+                {alreadyAdded
+                  ? "Already Planned"
+                  : "Add Activity"}
+              </button>
+            </SectionCard>
+          );
+        })}
+      </div>
+    </div>
   </div>
+   )}
+   </div>
 )}
 
         {/* ───── TRANSFERS TAB ───── */}
@@ -2215,6 +2406,7 @@ await handleBookActivity(activity);
           </div>
         )}
       </div>
+      
       {selectedHotel && (
   <div
     onClick={() => setSelectedHotel(null)}

@@ -20,7 +20,7 @@ import { Chip, SectionCard, AmountPill } from "../components/SharedComponents";
 import { useTrip, useTripExpenses } from "../hooks/useRealtime";
 "../../services/dataService";
 import { getActivities } from "../../services/geoapify/geoapify";
-import { getWikipediaImage } from "../../services/images/image.service";
+import { getPlaceImage } from "../../services/images/image.service";
 import {
   addExpense,
   addPlannedActivity,
@@ -654,7 +654,10 @@ const [showActivityPicker, setShowActivityPicker] =
 
   const updatedActivities = await Promise.all(
     data.map(async (activity) => {
-      const image = await getWikipediaImage(activity.name);
+      const image = await getPlaceImage(
+  activity.name,
+  trip.destination
+);
 
       return {
         ...activity,

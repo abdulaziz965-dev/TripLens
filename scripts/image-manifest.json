@@ -1,0 +1,497 @@
+[
+  {
+    "id": "charminar",
+    "city": "hyderabad",
+    "name": "Charminar",
+    "slug": "charminar",
+    "assetPath": "src/assets/places/hyderabad/charminar.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "golconda-fort",
+    "city": "hyderabad",
+    "name": "Golconda Fort",
+    "slug": "golconda-fort",
+    "assetPath": "src/assets/places/hyderabad/golconda-fort.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "ramoji-film-city",
+    "city": "hyderabad",
+    "name": "Ramoji Film City",
+    "slug": "ramoji-film-city",
+    "assetPath": "src/assets/places/hyderabad/ramoji-film-city.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "salar-jung-museum",
+    "city": "hyderabad",
+    "name": "Salar Jung Museum",
+    "slug": "salar-jung-museum",
+    "assetPath": "src/assets/places/hyderabad/salar-jung-museum.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "hussain-sagar",
+    "city": "hyderabad",
+    "name": "Hussain Sagar",
+    "slug": "hussain-sagar",
+    "assetPath": "src/assets/places/hyderabad/hussain-sagar.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "doddabetta-peak",
+    "city": "ooty",
+    "name": "Doddabetta Peak",
+    "slug": "doddabetta-peak",
+    "assetPath": "src/assets/places/ooty/doddabetta-peak.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "government-botanical-garden",
+    "city": "ooty",
+    "name": "Government Botanical Garden",
+    "slug": "government-botanical-garden",
+    "assetPath": "src/assets/places/ooty/government-botanical-garden.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "ooty-lake",
+    "city": "ooty",
+    "name": "Ooty Lake",
+    "slug": "ooty-lake",
+    "assetPath": "src/assets/places/ooty/ooty-lake.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "tea-museum",
+    "city": "ooty",
+    "name": "Tea Museum",
+    "slug": "tea-museum",
+    "assetPath": "src/assets/places/ooty/tea-museum.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "nilgiri-mountain-railway",
+    "city": "ooty",
+    "name": "Nilgiri Mountain Railway",
+    "slug": "nilgiri-mountain-railway",
+    "assetPath": "src/assets/places/ooty/nilgiri-mountain-railway.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "baga-beach",
+    "city": "goa",
+    "name": "Baga Beach",
+    "slug": "baga-beach",
+    "assetPath": "src/assets/places/goa/baga-beach.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "calangute-beach",
+    "city": "goa",
+    "name": "Calangute Beach",
+    "slug": "calangute-beach",
+    "assetPath": "src/assets/places/goa/calangute-beach.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "dudhsagar-falls",
+    "city": "goa",
+    "name": "Dudhsagar Falls",
+    "slug": "dudhsagar-falls",
+    "assetPath": "src/assets/places/goa/dudhsagar-falls.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "fort-aguada",
+    "city": "goa",
+    "name": "Fort Aguada",
+    "slug": "fort-aguada",
+    "assetPath": "src/assets/places/goa/fort-aguada.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "basilica-of-bom-jesus",
+    "city": "goa",
+    "name": "Basilica Of Bom Jesus",
+    "slug": "basilica-of-bom-jesus",
+    "assetPath": "src/assets/places/goa/basilica-of-bom-jesus.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "mysore-palace",
+    "city": "mysore",
+    "name": "Mysore Palace",
+    "slug": "mysore-palace",
+    "assetPath": "src/assets/places/mysore/mysore-palace.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "chamundi-hills",
+    "city": "mysore",
+    "name": "Chamundi Hills",
+    "slug": "chamundi-hills",
+    "assetPath": "src/assets/places/mysore/chamundi-hills.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "brindavan-gardens",
+    "city": "mysore",
+    "name": "Brindavan Gardens",
+    "slug": "brindavan-gardens",
+    "assetPath": "src/assets/places/mysore/brindavan-gardens.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "mysore-zoo",
+    "city": "mysore",
+    "name": "Mysore Zoo",
+    "slug": "mysore-zoo",
+    "assetPath": "src/assets/places/mysore/mysore-zoo.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "st-philomenas-cathedral",
+    "city": "mysore",
+    "name": "St. Philomena's Cathedral",
+    "slug": "st-philomenas-cathedral",
+    "assetPath": "src/assets/places/mysore/st-philomenas-cathedral.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "abbey-falls",
+    "city": "coorg",
+    "name": "Abbey Falls",
+    "slug": "abbey-falls",
+    "assetPath": "src/assets/places/coorg/abbey-falls.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "rajas-seat",
+    "city": "coorg",
+    "name": "Raja's Seat",
+    "slug": "rajas-seat",
+    "assetPath": "src/assets/places/coorg/rajas-seat.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "dubare-elephant-camp",
+    "city": "coorg",
+    "name": "Dubare Elephant Camp",
+    "slug": "dubare-elephant-camp",
+    "assetPath": "src/assets/places/coorg/dubare-elephant-camp.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "talacauvery",
+    "city": "coorg",
+    "name": "Talacauvery",
+    "slug": "talacauvery",
+    "assetPath": "src/assets/places/coorg/talacauvery.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "mandalpatti-viewpoint",
+    "city": "coorg",
+    "name": "Mandalpatti Viewpoint",
+    "slug": "mandalpatti-viewpoint",
+    "assetPath": "src/assets/places/coorg/mandalpatti-viewpoint.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "tea-gardens",
+    "city": "munnar",
+    "name": "Tea Gardens",
+    "slug": "tea-gardens",
+    "assetPath": "src/assets/places/munnar/tea-gardens.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "eravikulam-national-park",
+    "city": "munnar",
+    "name": "Eravikulam National Park",
+    "slug": "eravikulam-national-park",
+    "assetPath": "src/assets/places/munnar/eravikulam-national-park.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "mattupetty-dam",
+    "city": "munnar",
+    "name": "Mattupetty Dam",
+    "slug": "mattupetty-dam",
+    "assetPath": "src/assets/places/munnar/mattupetty-dam.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "echo-point",
+    "city": "munnar",
+    "name": "Echo Point",
+    "slug": "echo-point",
+    "assetPath": "src/assets/places/munnar/echo-point.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "top-station",
+    "city": "munnar",
+    "name": "Top Station",
+    "slug": "top-station",
+    "assetPath": "src/assets/places/munnar/top-station.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "kodaikanal-lake",
+    "city": "kodaikanal",
+    "name": "Kodaikanal Lake",
+    "slug": "kodaikanal-lake",
+    "assetPath": "src/assets/places/kodaikanal/kodaikanal-lake.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "coakers-walk",
+    "city": "kodaikanal",
+    "name": "Coaker's Walk",
+    "slug": "coakers-walk",
+    "assetPath": "src/assets/places/kodaikanal/coakers-walk.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "pillar-rocks",
+    "city": "kodaikanal",
+    "name": "Pillar Rocks",
+    "slug": "pillar-rocks",
+    "assetPath": "src/assets/places/kodaikanal/pillar-rocks.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "pine-forest",
+    "city": "kodaikanal",
+    "name": "Pine Forest",
+    "slug": "pine-forest",
+    "assetPath": "src/assets/places/kodaikanal/pine-forest.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "guna-caves",
+    "city": "kodaikanal",
+    "name": "Guna Caves",
+    "slug": "guna-caves",
+    "assetPath": "src/assets/places/kodaikanal/guna-caves.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "lalbagh-botanical-garden",
+    "city": "bangalore",
+    "name": "Lalbagh Botanical Garden",
+    "slug": "lalbagh-botanical-garden",
+    "assetPath": "src/assets/places/bangalore/lalbagh-botanical-garden.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "cubbon-park",
+    "city": "bangalore",
+    "name": "Cubbon Park",
+    "slug": "cubbon-park",
+    "assetPath": "src/assets/places/bangalore/cubbon-park.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "bangalore-palace",
+    "city": "bangalore",
+    "name": "Bangalore Palace",
+    "slug": "bangalore-palace",
+    "assetPath": "src/assets/places/bangalore/bangalore-palace.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "iskcon-temple",
+    "city": "bangalore",
+    "name": "ISKCON Temple",
+    "slug": "iskcon-temple",
+    "assetPath": "src/assets/places/bangalore/iskcon-temple.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "bannerghatta-national-park",
+    "city": "bangalore",
+    "name": "Bannerghatta National Park",
+    "slug": "bannerghatta-national-park",
+    "assetPath": "src/assets/places/bangalore/bannerghatta-national-park.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "marina-beach",
+    "city": "chennai",
+    "name": "Marina Beach",
+    "slug": "marina-beach",
+    "assetPath": "src/assets/places/chennai/marina-beach.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "kapaleeshwarar-temple",
+    "city": "chennai",
+    "name": "Kapaleeshwarar Temple",
+    "slug": "kapaleeshwarar-temple",
+    "assetPath": "src/assets/places/chennai/kapaleeshwarar-temple.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "fort-st-george",
+    "city": "chennai",
+    "name": "Fort St. George",
+    "slug": "fort-st-george",
+    "assetPath": "src/assets/places/chennai/fort-st-george.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "government-museum",
+    "city": "chennai",
+    "name": "Government Museum",
+    "slug": "government-museum",
+    "assetPath": "src/assets/places/chennai/government-museum.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "vivekananda-house",
+    "city": "chennai",
+    "name": "Vivekananda House",
+    "slug": "vivekananda-house",
+    "assetPath": "src/assets/places/chennai/vivekananda-house.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "fort-kochi",
+    "city": "kochi",
+    "name": "Fort Kochi",
+    "slug": "fort-kochi",
+    "assetPath": "src/assets/places/kochi/fort-kochi.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "chinese-fishing-nets",
+    "city": "kochi",
+    "name": "Chinese Fishing Nets",
+    "slug": "chinese-fishing-nets",
+    "assetPath": "src/assets/places/kochi/chinese-fishing-nets.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "mattancherry-palace",
+    "city": "kochi",
+    "name": "Mattancherry Palace",
+    "slug": "mattancherry-palace",
+    "assetPath": "src/assets/places/kochi/mattancherry-palace.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "jew-town",
+    "city": "kochi",
+    "name": "Jew Town",
+    "slug": "jew-town",
+    "assetPath": "src/assets/places/kochi/jew-town.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "marine-drive",
+    "city": "kochi",
+    "name": "Marine Drive",
+    "slug": "marine-drive",
+    "assetPath": "src/assets/places/kochi/marine-drive.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "rock-beach",
+    "city": "pondicherry",
+    "name": "Rock Beach",
+    "slug": "rock-beach",
+    "assetPath": "src/assets/places/pondicherry/rock-beach.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "auroville",
+    "city": "pondicherry",
+    "name": "Auroville",
+    "slug": "auroville",
+    "assetPath": "src/assets/places/pondicherry/auroville.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "matrimandir",
+    "city": "pondicherry",
+    "name": "Matrimandir",
+    "slug": "matrimandir",
+    "assetPath": "src/assets/places/pondicherry/matrimandir.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "french-quarter",
+    "city": "pondicherry",
+    "name": "French Quarter",
+    "slug": "french-quarter",
+    "assetPath": "src/assets/places/pondicherry/french-quarter.jpg",
+    "downloaded": false,
+    "verified": false
+  },
+  {
+    "id": "paradise-beach",
+    "city": "pondicherry",
+    "name": "Paradise Beach",
+    "slug": "paradise-beach",
+    "assetPath": "src/assets/places/pondicherry/paradise-beach.jpg",
+    "downloaded": false,
+    "verified": false
+  }
+]

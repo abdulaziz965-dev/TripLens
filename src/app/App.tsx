@@ -26,6 +26,7 @@ import { ExpensesScreen } from "./pages/ExpensesScreen";
 import { ProfileScreen } from "./pages/ProfileScreen";
 import { AppLoadingScreen } from "./pages/AppLoadingScreen";
 import { PaymentMethodsScreen } from "./pages/PaymentMethodsScreen";
+import ImageManagerScreen from "./pages/ImageManagerScreen";
 
 import { SettingsScreen } from "./pages/SettingsScreen";
 import { TravelerVerificationScreen } from "./pages/TravelerVerificationScreen";
@@ -439,6 +440,14 @@ export default function App() {
         <Route path="/verification" element={ <AppViewport> <TravelerVerificationScreen />  </AppViewport>}/>
         <Route path="/edit-profile" element={ <AppViewport> <EditProfileScreen /></AppViewport>}/>
         <Route path="/profile" element={<ProfileRoute ready={authReady} user={currentUser} />} />
+        <Route
+  path="/image-manager"
+  element={
+    <AppViewport>
+      <ImageManagerScreen />
+    </AppViewport>
+  }
+/>
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>

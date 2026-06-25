@@ -10,10 +10,15 @@ interface WikipediaImageResponse {
   };
 }
 const imageCache = new Map<string, string>();
-export async function getWikipediaImage(
-  title: string
+export async function getPlaceImage(
+  placeName: string,
+  destination?: string
 ): Promise<string | null> {
- const key = title.trim().toLowerCase();
+const searchQuery = destination
+  ? `${placeName} ${destination}`
+  : placeName;
+
+const key = searchQuery.trim().toLowerCase();
 
 if (imageCache.has(key)) {
   return imageCache.get(key)!;
@@ -23,28 +28,21 @@ if (imageCache.has(key)) {
     const data =
       await apiFetch<WikipediaImageResponse>(
         `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
-          title
+          searchQuery
         )}`
       );
 
-    const image =
+   const image =
   data.originalimage?.source ??
   data.thumbnail?.source ??
-  null;
+  `https://source.unsplash.com/1200x800/?${encodeURIComponent(searchQuery)}`;
 
-if (image) {
-  imageCache.set(key, image);
-}
+imageCache.set(key, image);
 
 return image;
+
+
   } catch {
     return null;
   }
-}
-export async function testWikipediaImage() {
-  const image = await getWikipediaImage("Charminar");
-
-  console.log("Wikipedia Image:", image);
-
-  return image;
 }

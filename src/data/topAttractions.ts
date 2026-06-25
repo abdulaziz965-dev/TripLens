@@ -1,11 +1,18 @@
 export interface Attraction {
   id: string;
   name: string;
-  rating: number;
-  price: string;
-  duration: string;
+
   description: string;
+
   image?: string;
+
+  rating?: number;
+  price?: string;
+  duration?: string;
+
+  wikipedia?: string;
+  geoapifySearch?: string;
+  tags?: string[];
 }
 
 export const topAttractions: Record<string, Attraction[]> = {

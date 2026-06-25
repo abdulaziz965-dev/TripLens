@@ -3,6 +3,10 @@ import React, {
   useState,
   useEffect
 } from "react";
+import type {
+  Activity,
+  PlannedActivity,
+} from "../../types/activity";
 import {
   ChevronLeft, MapPin, Hotel, Car, Wallet,
   Star, CheckCircle, AlertTriangle, Plus, X, Trash2, Plane,
@@ -15,7 +19,8 @@ import { T, display, body, heading, label, bodyMed } from "../theme";
 import { Chip, SectionCard, AmountPill } from "../components/SharedComponents";
 import { useTrip, useTripExpenses } from "../hooks/useRealtime";
 "../../services/dataService";
-import { getActivities } from "../../services/geoapify";
+import { getActivities } from "../../services/geoapify/geoapify";
+import { getWikipediaImage } from "../../services/images/image.service";
 import {
   addExpense,
   addPlannedActivity,
@@ -29,6 +34,7 @@ import {
   getTripDurationLabel,
   type HotelRecommendation,
 } from "../../data/tripIntelligence";
+
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -64,148 +70,7 @@ const TRANSPORT_MODES: { id: TransportMode; label: string; icon: React.ReactNode
     description: "Air travel options",
   },
 ];
-const activitiesByCity: Record<string, any[]> = {
-  ooty: [
-    {
-      id: "tea",
-      name: "Tea Museum",
-      price: "₹200",
-      duration: "90 Minutes",
-      rating: "4.6",
-      image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      description:
-        "Discover the history of tea cultivation and processing in the Nilgiris.",
-    },
-    {
-      id: "boat",
-      name: "Boat Ride",
-      price: "₹350",
-      duration: "1 Hour",
-      rating: "4.8",
-      image:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-      description:
-        "Enjoy a peaceful boat ride surrounded by Ooty's scenic landscapes.",
-    },
-    {
-      id: "peak",
-      name: "Doddabetta Peak",
-      price: "₹150",
-      duration: "2 Hours",
-      rating: "4.7",
-      image:
-        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b",
-      description:
-        "Visit the highest peak in the Nilgiris and enjoy panoramic views.",
-    },
-    {
-      id: "garden",
-      name: "Botanical Garden",
-      price: "₹100",
-      duration: "2 Hours",
-      rating: "4.5",
-      image:
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
-      description:
-        "Explore Ooty's famous botanical gardens featuring rare plants and flowers.",
-    },
-  ],
 
-  goa: [
-    {
-      id: "scuba",
-      name: "Scuba Diving",
-      price: "₹2500",
-      duration: "3 Hours",
-      rating: "4.9",
-      image:
-        "https://images.unsplash.com/photo-1544551763-46a013bb70d5",
-      description:
-        "Explore vibrant marine life beneath Goa's crystal-clear waters.",
-    },
-    {
-      id: "parasailing",
-      name: "Parasailing",
-      price: "₹1800",
-      duration: "30 Minutes",
-      rating: "4.8",
-      image:
-        "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
-      description:
-        "Experience breathtaking aerial views of Goa's beaches.",
-    },
-    {
-      id: "dudhsagar",
-      name: "Dudhsagar Falls",
-      price: "₹1200",
-      duration: "Half Day",
-      rating: "4.9",
-      image:
-        "https://images.unsplash.com/photo-1439066615861-d1af74d74000",
-      description:
-        "Visit one of India's tallest and most spectacular waterfalls.",
-    },
-    {
-      id: "cruise",
-      name: "Sunset Cruise",
-      price: "₹900",
-      duration: "2 Hours",
-      rating: "4.6",
-      image:
-        "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
-      description:
-        "Enjoy music, food, and beautiful sunset views over the Arabian Sea.",
-    },
-  ],
-
-  hyderabad: [
-    {
-      id: "charminar",
-      name: "Charminar",
-      price: "₹100",
-      duration: "2 Hours",
-      rating: "4.7",
-      image:
-        "https://images.unsplash.com/photo-1599661046289-e31897846e41",
-      description:
-        "Explore Hyderabad's iconic monument and surrounding markets.",
-    },
-    {
-      id: "ramoji",
-      name: "Ramoji Film City",
-      price: "₹1350",
-      duration: "Full Day",
-      rating: "4.8",
-      image:
-        "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba",
-      description:
-        "Visit the world's largest integrated film studio complex.",
-    },
-    {
-      id: "golconda",
-      name: "Golconda Fort",
-      price: "₹200",
-      duration: "3 Hours",
-      rating: "4.7",
-      image:
-        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c",
-      description:
-        "Walk through centuries of history at Hyderabad's famous fort.",
-    },
-    {
-      id: "hussain",
-      name: "Hussain Sagar Boat Ride",
-      price: "₹300",
-      duration: "1 Hour",
-      rating: "4.5",
-      image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-      description:
-        "Enjoy a relaxing boat ride to the Buddha statue in Hussain Sagar Lake.",
-    },
-  ],
-};
 const travelOptions = [
   // ✈️ FLIGHTS
   {
@@ -706,7 +571,7 @@ useEffect(() => {
   const [selectedTransport, setSelectedTransport] =
   useState<(typeof travelOptions)[number] | null>(null);
   const [selectedActivity, setSelectedActivity] =
-  useState<Record<string, any> | null>(null);
+useState<Activity | null>(null);
   const [showAddExpense, setShowAddExpense] = useState(false);
 const activityName = toTitleCase(
   selectedActivity?.name ??
@@ -723,19 +588,19 @@ const activityImage =
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
 
 const activityPrice =
-  selectedActivity?.price ?? "Free";
+  selectedActivity?.price ?? null;
 
 const activityRating =
-  selectedActivity?.rating ?? "4.5";
+  selectedActivity?.rating ?? null;
 
 const activityDuration =
-  selectedActivity?.duration ?? "Flexible";
+  selectedActivity?.duration ?? null;
   const [expenseTitle, setExpenseTitle] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
-  const [activities, setActivities] = useState<any[]>([]);
+  const [activities,setActivities]=useState<Activity[]>([]);
   const [dayPlans, setDayPlans] = useState<
-  Record<string, any[]>
+  Record<string, PlannedActivity[]>
 >({});
 useEffect(() => {
   if (!trip || !auth.currentUser) return;
@@ -745,7 +610,7 @@ useEffect(() => {
       trip.id,
       auth.currentUser.uid,
       (items) => {
-        const plans: Record<string, any[]> = {};
+        const plans: Record<string, PlannedActivity[]> = {};
 
         items.forEach(item => {
           if (!plans[item.day]) {
@@ -784,34 +649,30 @@ const [showActivityPicker, setShowActivityPicker] =
       );
       
 
-      if (data.length > 0) {
-        setActivities(data);
-      } else {
-        const city =
-  trip.destination
-    .split(",")[0]
-    .trim()
-    .toLowerCase();
+     if (data.length > 0) {
+  setActivities(data);
 
-        setActivities(
-          activitiesByCity[city] ??
-          activitiesByCity["ooty"]
-        );
-      }
-    } catch (err) {
-      console.error(err);
+  const updatedActivities = await Promise.all(
+    data.map(async (activity) => {
+      const image = await getWikipediaImage(activity.name);
 
-      const city =
-        trip.destination
-          .split(",")[0]
-          .trim()
-          .toLowerCase();
+      return {
+        ...activity,
+        image: image ?? activity.image,
+      };
+    })
+  );
 
-      setActivities(
-        activitiesByCity[city] ??
-        activitiesByCity["ooty"]
-      );
-    } finally {
+  setActivities(updatedActivities);
+} else {
+  setActivities([]);
+  toast.error("No activities found.");
+}
+    }catch(err){
+    console.error(err);
+    toast.error("Couldn't load activities.");
+    setActivities([]);
+} finally {
       
     }
   };
@@ -1943,9 +1804,9 @@ if (alreadyBooked) {
           const rating =
             activity.rating ?? "4.5";
 
-          const image =
-            activity.image ??
-            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200";
+         const image =
+activity.image ??
+"/placeholder.jpg";
 
           return (
             <SectionCard
@@ -1986,7 +1847,9 @@ if (alreadyBooked) {
                   marginTop: 4,
                 }}
               >
-                ⭐ {rating}
+                {rating && (
+    <p>⭐ {rating}</p>
+)}
               </p>
 
               <p
@@ -2020,8 +1883,8 @@ if (alreadyBooked) {
                   </p>
 
                   <AmountPill
-                    value={activity.price}
-                  />
+    value={activity.price ?? "Free"}
+/>
                 </>
               )}
 

@@ -11,8 +11,10 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
-
-// ─────────────────────────────────────────────────────────────────────────────
+import type { Trip } from "../types/trip";
+import type { Expense } from "../types/expense";
+import type { PlannedActivity } from "@/types/activity";
+import { sortByNewest } from "../utils/firestore";
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -35,48 +37,9 @@ export interface RealityInsight {
   type: "warn" | "info";
 }
 
-export interface Trip {
-  id: string;
-  userId: string;
-  name: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  adults: number;
-  children: number;
-  seniors: number;
-  totalTravelers?: number;
-  status: "Planning" | "Confirmed" | "Completed";
-  progress: number;
-  cost: string;
-  type: string;
-  createdAt: Timestamp;
-  savedAt?: Timestamp;
-}
 
-export type ExpenseType =
-  | "hotel"
-  | "flight"
-  | "train"
-  | "bus"
-  | "food"
-  | "shopping"
-  | "activities"
-  | "transport"
-  | "transfer"
-  | "activity"
-  | "miscellaneous";
 
-export interface Expense {
-  id: string;
-  tripId: string;
-  userId: string;
-  label: string;
-  amount: string;
-  category: "Confirmed" | "Manual";
-  expenseType?: ExpenseType;
-  createdAt: Timestamp;
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Listeners
@@ -90,10 +53,16 @@ export const subscribeToDestinations = (callback: (data: Destination[]) => void)
   });
 };
 
-export const subscribeToInsights = (callback: (data: RealityInsight[]) => void) => {
+export const subscribeToInsights = (
+  callback: (data: RealityInsight[]) => void
+) => {
   const q = collection(db, "insights");
+
   return onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RealityInsight));
+    const data = snapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() } as RealityInsight)
+    );
+
     callback(data);
   });
 };
@@ -106,14 +75,11 @@ export const subscribeToTrips = (userId: string, callback: (data: Trip[]) => voi
   where("userId", "==", userId)
 );
   return onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() } as Trip))
-      .sort((a, b) => {
-        // Sort descending by createdAt (newest first)
-        const aTime = a.createdAt?.toMillis?.() ?? 0;
-        const bTime = b.createdAt?.toMillis?.() ?? 0;
-        return bTime - aTime;
-      });
+    const data = sortByNewest(
+  snapshot.docs.map(
+    doc => ({ id: doc.id, ...doc.data() } as Trip)
+  )
+);
     callback(data);
   }, (error) => {
     console.error("[TripLens] subscribeToTrips error:", error.code, error.message);
@@ -153,7 +119,7 @@ export const subscribeToTripExpenses = (tripId: string,userId: string, callback:
 export const subscribeToPlannedActivities = (
   tripId: string,
   userId: string,
-  callback: (data: any[]) => void
+  callback: (data: PlannedActivity[]) => void
 ) => {
   const q = query(
     collection(db, "plannedActivities"),
@@ -163,10 +129,13 @@ export const subscribeToPlannedActivities = (
 
   return onSnapshot(q, snapshot => {
     callback(
-      snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
+      snapshot.docs.map(
+  doc =>
+    ({
+      id: doc.id,
+      ...doc.data(),
+    }) as PlannedActivity
+)
     );
   });
 };

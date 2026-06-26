@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore";
 export interface Trip {
   id: string;
   userId: string;
+  tripMode: "upcoming" | "dream";
   name: string;
   destination: string;
   startDate: string;

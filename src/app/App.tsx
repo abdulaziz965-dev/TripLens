@@ -27,7 +27,7 @@ import { ProfileScreen } from "./pages/ProfileScreen";
 import { AppLoadingScreen } from "./pages/AppLoadingScreen";
 import { PaymentMethodsScreen } from "./pages/PaymentMethodsScreen";
 import ImageManagerScreen from "./pages/ImageManagerScreen";
-
+import { CreateTripModeScreen } from "./pages/CreateTripModeScreen";
 import { SettingsScreen } from "./pages/SettingsScreen";
 import { TravelerVerificationScreen } from "./pages/TravelerVerificationScreen";
 import { EditProfileScreen } from "./pages/EditProfileScreen";
@@ -292,13 +292,44 @@ function HomeRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null 
     <AppViewport>
       <HomeScreen
         user={user}
-        onCreateTrip={(loc) => navigate("/create-trip", { state: { location: loc } })}
+        onCreateTrip={(loc) =>
+  navigate("/create-trip-mode", {
+    state: { location: loc },
+  })
+}
         onOpenTrip={(tripId) => navigate(`/trip/${tripId}`)}
       />
     </AppViewport>
   );
 }
+function CreateTripModeRoute({
+  ready,
+  user,
+}: {
+  ready: boolean;
+  user: FirebaseUser | null;
+}) {
+  const navigate = useNavigate();
 
+  if (!ready) return <AppLoadingScreen />;
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  return (
+    <AppViewport>
+      <CreateTripModeScreen
+        onBack={() => navigate("/home")}
+        onSelect={(mode) =>
+          navigate("/create-trip", {
+            state: {
+              tripMode: mode,
+            },
+          })
+        }
+      />
+    </AppViewport>
+  );
+}
 
 function CreateTripRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null }) {
   const navigate = useNavigate();
@@ -359,7 +390,7 @@ function TripsRoute({ ready, user }: { ready: boolean; user: FirebaseUser | null
   return (
     <AppViewport>
       <TripsScreen
-        onCreateTrip={() => navigate("/create-trip")}
+        onCreateTrip={() => navigate("/create-trip-mode")}
         onSelectTrip={(trip) => navigate(`/trip/${trip.id}`)}
       />
     </AppViewport>
@@ -431,6 +462,7 @@ export default function App() {
         <Route path="/landing" element={<LandingRoute ready={authReady} user={currentUser} />} />
         <Route path="/login" element={<LoginRoute ready={authReady} user={currentUser} />} />
         <Route path="/home" element={<HomeRoute ready={authReady} user={currentUser} />} />
+        <Route path="/create-trip-mode" element={<CreateTripModeRoute ready={authReady} user={currentUser} />} />
         <Route path="/create-trip" element={<CreateTripRoute ready={authReady} user={currentUser} />} />
         <Route path="/trip/:tripId" element={<TripDashboardRoute ready={authReady} user={currentUser} />} />
         <Route path="/trips" element={<TripsRoute ready={authReady} user={currentUser} />} />

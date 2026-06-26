@@ -19,10 +19,11 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
   const initialLocation = routerLocation.state?.location || "";
 
   const [tripType, setTripType] = useState("family");
+  const tripMode =
+  routerLocation.state?.tripMode ?? "upcoming";
   const [tripName, setTripName] = useState("");
   const [destination, setDestination] = useState(initialLocation);
   const [showDropdown, setShowDropdown] = useState(false);
-  
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [adults, setAdults] = useState(2);
@@ -60,8 +61,9 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
         totalTravelers,
         status: "Planning",
         progress: 10,
-        cost: "₹0", 
+        cost: "₹0",
         type: tripType,
+        tripMode,
       });
       onDone(docRef.id);
     } catch (error) {
@@ -169,25 +171,89 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
           )}
         </div>
 
+
         {/* Date range */}
-        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-          <div style={{ flex: 1 }}>
-            {fieldLabel("Start Date")}
-            <div style={{ position: "relative" }}>
-              <Calendar size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.teal, zIndex: 1 }} />
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                style={{ ...inputStyle, paddingLeft: 36, fontSize: 13 }} />
-            </div>
-          </div>
-          <div style={{ flex: 1 }}>
-            {fieldLabel("End Date")}
-            <div style={{ position: "relative", width: "100%" }}>
-              <Calendar size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: T.teal, zIndex: 1 }} />
-              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-                style={{ ...inputStyle, paddingLeft: 36, fontSize: 13 }} />
-            </div>
-          </div>
-        </div>
+        {tripMode === "upcoming" ? (
+  <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+    <div style={{ flex: 1 }}>
+      {fieldLabel("Start Date")}
+      <div style={{ position: "relative" }}>
+        <Calendar
+          size={14}
+          style={{
+            position: "absolute",
+            left: 12,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: T.teal,
+            zIndex: 1,
+          }}
+        />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          style={{ ...inputStyle, paddingLeft: 36, fontSize: 13 }}
+        />
+      </div>
+    </div>
+
+    <div style={{ flex: 1 }}>
+      {fieldLabel("End Date")}
+      <div style={{ position: "relative" }}>
+        <Calendar
+          size={14}
+          style={{
+            position: "absolute",
+            left: 12,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: T.teal,
+            zIndex: 1,
+          }}
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          style={{ ...inputStyle, paddingLeft: 36, fontSize: 13 }}
+        />
+      </div>
+    </div>
+  </div>
+) : (
+  <div
+    style={{
+      marginBottom: 20,
+      padding: 18,
+      borderRadius: 16,
+      background: "#F8FAFC",
+      border: `1px solid ${T.border}`,
+    }}
+  >
+    <h3
+      style={{
+        margin: 0,
+        color: T.navy,
+        fontSize: 18,
+      }}
+    >
+      📅 Travel Dates
+    </h3>
+
+    <p
+      style={{
+        marginTop: 10,
+        color: T.slate,
+        lineHeight: 1.7,
+      }}
+    >
+      Dream Trips don't need fixed travel dates yet.
+      <br />
+      You'll choose them when you're ready to convert this into an Upcoming Trip.
+    </p>
+  </div>
+)}
 
         {/* Guests */}
         <div style={{ marginBottom: 16 }}>
@@ -272,7 +338,11 @@ export function CreateTripScreen({ onBack, onDone }: { onBack: () => void; onDon
           ...display, fontSize: 16, letterSpacing: -0.2,
           opacity: loading ? 0.7 : 1,
         }}>
-          {loading ? "Creating..." : "Create Trip"} <ArrowRight size={19} />
+          {loading
+  ? "Creating..."
+  : tripMode === "dream"
+  ? "Create Dream Trip"
+  : "Create Trip"} <ArrowRight size={19} />
         </button>
 
         <div style={{ height: 8 }} />

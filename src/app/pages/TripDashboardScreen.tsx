@@ -28,6 +28,7 @@ import {
   updateTrip,
   subscribeToPlannedActivities
 } from "../../services/dataService";
+import { PiggyBank } from "lucide-react";
 import {
   getHotelsForTrip,
   getTransportForTrip,
@@ -47,14 +48,37 @@ type DashboardTab =
 
 type TransportMode = "roadtrip" | "flight";
 
-const TABS: { id: DashboardTab; label: string; icon: React.ReactNode }[] = [
-  { id: "transport", label: "Transport", icon: <Car size={16} /> },
-  { id: "hotels", label: "Hotels", icon: <Hotel size={16} /> },
-  { id: "activities", label: "Activities", icon: <MapPin size={16} /> },
-  { id: "transfers", label: "Transfers", icon: <Car size={16} /> },
-  { id: "expenses", label: "Expenses", icon: <Wallet size={16} /> },
+const TABS: {
+  id: DashboardTab;
+  label: string;
+  icon: React.ReactNode;
+}[] = [
+  {
+    id: "activities",
+    label: "Activities",
+    icon: <MapPin size={16} />,
+  },
+  {
+    id: "hotels",
+    label: "Hotels",
+    icon: <Hotel size={16} />,
+  },
+  {
+    id: "transport",
+    label: "Transport",
+    icon: <Car size={16} />,
+  },
+  {
+    id: "transfers",
+    label: "Transfers",
+    icon: <Car size={16} />,
+  },
+  {
+  id: "expenses",
+  label: "Expenses",
+  icon: <Wallet size={16} />,
+},
 ];
-
 
 const TRANSPORT_MODES: { id: TransportMode; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -539,6 +563,7 @@ export function TripDashboardScreen({
 }) {
   const navigate = useNavigate();
   const { data: trip, loading } = useTrip(tripId);
+  const isDreamTrip = trip?.tripMode === "dream";
   useEffect(() => {
   if (
     trip &&
@@ -1118,11 +1143,15 @@ if (alreadyBooked) {
             <h1 style={{ ...display, fontSize: 22, color: "white", letterSpacing: -0.5 }}>
               {trip.name}
             </h1>
-            <p style={{ ...body, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>Trip Dashboard</p>
+            <p style={{ ...body, fontSize: 12, color: "rgba(255,255,255,0.45)" }}>{isDreamTrip ? "🌍 Dream Trip" : "✈️ Upcoming Trip"}</p>
           </div>
-          <Chip color={T.teal} bg="rgba(20,184,166,0.15)" border="rgba(20,184,166,0.3)">
-            {trip.status}
-          </Chip>
+          <Chip
+  color={isDreamTrip ? "#A855F7" : T.teal}
+  bg={isDreamTrip ? "rgba(168,85,247,0.15)" : "rgba(20,184,166,0.15)"}
+  border={isDreamTrip ? "rgba(168,85,247,0.3)" : "rgba(20,184,166,0.3)"}
+>
+  {isDreamTrip ? "🌍 Dreaming" : trip.status}
+</Chip>
         </div>
       </div>
         
@@ -1170,12 +1199,12 @@ if (alreadyBooked) {
     </div>
 
     <Chip
-      color={T.teal}
-      bg="rgba(20,184,166,0.15)"
-      border="rgba(20,184,166,0.3)"
-    >
-      {trip.status}
-    </Chip>
+  color={isDreamTrip ? "#A855F7" : T.teal}
+  bg={isDreamTrip ? "rgba(168,85,247,0.15)" : "rgba(20,184,166,0.15)"}
+  border={isDreamTrip ? "rgba(168,85,247,0.3)" : "rgba(20,184,166,0.3)"}
+>
+  {isDreamTrip ? "🌍 Dreaming" : trip.status}
+</Chip>
   </div>
 
   {/* Progress */}
@@ -1280,13 +1309,13 @@ if (alreadyBooked) {
 
     <div>
       <p
-        style={{
-          fontSize: 11,
-          color: "rgba(255,255,255,0.5)",
-        }}
-      >
-        Budget Used
-      </p>
+  style={{
+    fontSize: 11,
+    color: "rgba(255,255,255,0.5)",
+  }}
+>
+  {isDreamTrip ? "Dream Goal" : "Budget Used"}
+</p>
 
       <p
         style={{
@@ -1316,7 +1345,7 @@ if (alreadyBooked) {
           fontSize: 15,
         }}
       >
-        {trip.status}
+        {isDreamTrip ? "Dreaming" : trip.status}
       </p>
     </div>
   </div>
@@ -1358,7 +1387,17 @@ if (alreadyBooked) {
                 fontSize: 12,
               }}
             >
-              {t.icon} {t.label}
+              {t.id === "expenses" ? (
+  <>
+    {isDreamTrip ? <PiggyBank size={16} /> : <Wallet size={16} />}
+    {isDreamTrip ? "Dream Fund" : "Expenses"}
+  </>
+) : (
+  <>
+    {t.icon}
+    {t.label}
+  </>
+)}
             </button>
           );
         })}
